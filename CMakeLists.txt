@@ -43,6 +43,9 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 	-Wuninitialized
 	-Ofast
 	">"
+	"$<$<COMPILE_LANG_AND_ID:C,MSVC>:"
+	/W4
+	">"
 )
 
 target_link_options(${PROJECT_NAME} PRIVATE

@@ -15,18 +15,32 @@
 #define NULL ((void *)0)
 #endif
 
-#define SF_ARRAY_INIT(a, value)                                                                                                            \
-	do                                                                                                                                 \
-	{                                                                                                                                  \
-		size_t i_;                                                                                                                 \
-		for (i_ = 0; i_ < SF_SIZE(a); ++i_)                                                                                        \
-			(a)[i_] = value;                                                                                                   \
+#define SF_ARRAY_INIT(a, value)                     \
+	do {                                        \
+		size_t i_;                          \
+		for (i_ = 0; i_ < SF_SIZE(a); ++i_) \
+			(a)[i_] = value;            \
 	} while (0)
 
-#define SF_EXTERNAL
-#define SF_INTERNAL static
-#define SF_INLINE inline
-#define SF_LOCAL_PERSIST static
+#define SF_MEMORY_COPY(destination, source, size)                                   \
+	do {                                                                        \
+		u64 i;                                                              \
+		for (i = 0; i < size; ++i)                                          \
+			((sf_byte *)destination)[i] = ((sf_byte const *)source)[i]; \
+	} while (0)
+
+#define SF_MEMORY_SET(destination, source, size)                        \
+	do {                                                            \
+		u64 i;                                                  \
+		for (i = 0; i < size; ++i)                              \
+			((sf_byte *)destination)[i] = ((sf_byte)value); \
+	} while (0)
+
+#define SF_STRING_LITERAL(source, s)            \
+	do {                                    \
+		(s)->size = sizeof(source) - 1; \
+		(s)->data = source;             \
+	} while (0)
 
 #define sf_public
 #define sf_private static
@@ -39,18 +53,16 @@ typedef uint64_t      u64;
 
 typedef int32_t sf_bool;
 
-struct sf_arena
-{
+struct sf_arena {
 	sf_byte *data;
-	u64   position;
-	u64   alignment;
-	u64   capacity;
+	u64	 position;
+	u64	 alignment;
+	u64	 capacity;
 };
 
-struct sf_string
-{
-	u64   size;
-	char const*data;
+struct sf_string {
+	u64	    size;
+	char const *data;
 };
 
 sf_public void *
@@ -61,22 +73,6 @@ sf_arena_scratch(struct sf_arena *arena, u64 capacity, struct sf_arena *scratch)
 
 sf_public void
 sf_arena_clear(struct sf_arena *arena);
-
-#define SF_MEMORY_COPY(destination, source, size)                                                                                          \
-	do                                                                                                                                 \
-	{                                                                                                                                  \
-		u64 i;                                                                                                                     \
-		for (i = 0; i < size; ++i)                                                                                                \
-			((sf_byte *)destination)[i] = ((sf_byte const *)source)[i];                                                        \
-	} while (0)
-
-#define SF_MEMORY_SET(destination, source, size)                                                                                           \
-	do                                                                                                                                 \
-	{                                                                                                                                  \
-		u64 i;                                                                                                                     \
-		for (i = 0; i < size; ++i)                                                                                                \
-			((sf_byte *)destination)[i] = ((sf_byte)value);                                                                    \
-	} while (0)
 
 sf_public void
 sf_string_from_non_literal(char const *non_literal, u64 max_size, struct sf_string *str);
@@ -90,29 +86,24 @@ sf_string_clone(struct sf_arena *arena, struct sf_string const *source, struct s
 sf_public void
 sf_string_null_terminate(struct sf_arena *arena, struct sf_string const *source, struct sf_string *destination);
 
-sf_public void
-sf_assert(sf_bool test, struct sf_string file, struct sf_string function, int line, struct sf_string expresion);
-
 #ifdef SF_CORE_IMPLEMENTATION
 
 #include <stdio.h>
 
 sf_private u64
-sf_u64_align(u64 value, u64 alignment)
-{ return (value + alignment - 1) & ~(alignment - 1); }
+sf_u64_align(u64 value, u64 alignment) {
+	return (value + alignment - 1) & ~(alignment - 1);
+}
 
 sf_public void *
-sf_arena_allocate(struct sf_arena *arena, u64 size)
-{
+sf_arena_allocate(struct sf_arena *arena, u64 size) {
 	sf_byte *memory = NULL;
 	u64	 i = 0, required_size = 0;
 
-	if (!arena || !size)
-		return NULL;
+	if (!arena || !size) return NULL;
 
 	required_size = arena->position + size;
-	if (required_size > arena->capacity)
-		return NULL;
+	if (required_size > arena->capacity) return NULL;
 
 	memory		= &arena->data[arena->position];
 	arena->position = sf_u64_align(required_size, arena->alignment);
@@ -124,75 +115,63 @@ sf_arena_allocate(struct sf_arena *arena, u64 size)
 }
 
 sf_public void
-sf_arena_scratch(struct sf_arena *arena, u64 capacity, struct sf_arena *scratch)
-{
+sf_arena_scratch(struct sf_arena *arena, u64 capacity, struct sf_arena *scratch) {
 	scratch->position = 0;
 
 	scratch->data = sf_arena_allocate(arena, capacity);
-	if (scratch->data)
-	{
+	if (scratch->data) {
 		scratch->alignment = arena->alignment;
 		scratch->capacity  = capacity;
-	}
-	else
-	{
+	} else {
 		scratch->alignment = 0;
 		scratch->capacity  = 0;
 	}
 }
 
 sf_public void
-sf_arena_clear(struct sf_arena *arena)
-{ arena->position = 0; }
+sf_arena_clear(struct sf_arena *arena) {
+	arena->position = 0;
+}
 
 sf_private u64
-sf_non_literal_string_size(char const *non_literal, u64 max_size)
-{
+sf_non_literal_string_size(char const *non_literal, u64 max_size) {
 	u64 i = 0;
 
 	for (i = 0; i < max_size; ++i)
-		if ('\0' == non_literal[i])
-			return i;
+		if ('\0' == non_literal[i]) return i;
 
 	return max_size;
 }
 
 sf_public void
-sf_string_from_non_literal(char const *non_literal, u64 max_size, struct sf_string *destination)
-{
+sf_string_from_non_literal(char const *non_literal, u64 max_size, struct sf_string *destination) {
 	destination->data = non_literal;
 	destination->size = sf_non_literal_string_size(non_literal, max_size);
 }
 
 sf_public sf_bool
-sf_string_compare(struct sf_string const *lhs, struct sf_string const *rhs, u64 max_size)
-{
+sf_string_compare(struct sf_string const *lhs, struct sf_string const *rhs, u64 max_size) {
 	u64 i = 0;
 
-	if (lhs->size != rhs->size)
-		return SF_FALSE;
+	if (lhs->size != rhs->size) return SF_FALSE;
 
 	for (i = 0; i < SF_MIN(lhs->size, max_size); ++i)
-		if (lhs->data[i] != rhs->data[i])
-			return SF_FALSE;
+		if (lhs->data[i] != rhs->data[i]) return SF_FALSE;
 
 	return SF_TRUE;
 }
 
 sf_public void
-sf_string_clone(struct sf_arena *arena, struct sf_string const *source, struct sf_string *destination)
-{
+sf_string_clone(struct sf_arena *arena, struct sf_string const *source, struct sf_string *destination) {
 	char *data = NULL;
 
-	if (!arena || !source || !destination)
-		return;
+	if (!arena || !source || !destination) return;
 
 	destination->size = 0;
 	destination->data = NULL;
 
 	data = sf_arena_allocate(arena, source->size);
-	if (!data)
-		return;
+	if (!data) return;
 
 	SF_MEMORY_COPY(data, source->data, source->size);
 
@@ -201,19 +180,16 @@ sf_string_clone(struct sf_arena *arena, struct sf_string const *source, struct s
 }
 
 sf_public void
-sf_string_null_terminate(struct sf_arena *arena, struct sf_string const *source, struct sf_string *destination)
-{
+sf_string_null_terminate(struct sf_arena *arena, struct sf_string const *source, struct sf_string *destination) {
 	char *data = NULL;
 
-	if (!arena || !source || !destination)
-		return;
+	if (!arena || !source || !destination) return;
 
 	destination->size = 0;
 	destination->data = NULL;
 
 	data = sf_arena_allocate(arena, source->size + 1);
-	if (!data)
-		return;
+	if (!data) return;
 
 	SF_MEMORY_COPY(data, source->data, destination->size);
 	data[source->size] = '\0';
