@@ -23,7 +23,7 @@ sf_graphics_get_texture_from_resource_pool(struct sf_graphics_renderer *r) {
 
 sf_private sf_bool
 sf_graphics_is_null_handle(sf_handle handle) {
-	return handle = SF_NULL_HANDLE;
+	return handle == SF_NULL_HANDLE;
 }
 
 sf_private sf_handle
@@ -1072,7 +1072,7 @@ sf_graphics_vulkan_create_render_target(
 		    clear_value
 		);
 
-		if (!sf_graphics_is_null_handle(result->color_attachments[i])) goto error;
+		if (sf_graphics_is_null_handle(result->color_attachments[i])) goto error;
 	}
 
 	for (i = 0; i < result->resolve_attachment_count; ++i) {
@@ -1092,7 +1092,7 @@ sf_graphics_vulkan_create_render_target(
 		    clear_value,
 		    vk_swapchain_image
 		);
-		if (!sf_graphics_is_null_handle(result->resolve_attachments[i])) goto error;
+		if (sf_graphics_is_null_handle(result->resolve_attachments[i])) goto error;
 	}
 
 	if (depth_stencil_format != SF_GRAPHICS_FORMAT_UNDEFINED) {
@@ -1109,7 +1109,7 @@ sf_graphics_vulkan_create_render_target(
 		    SF_FALSE,
 		    depth_stencil_clear_value
 		);
-		if (!sf_graphics_is_null_handle(result->depth_stencil_attachment)) goto error;
+		if (sf_graphics_is_null_handle(result->depth_stencil_attachment)) goto error;
 	}
 
 	sf_graphics_vulkan_create_render_target_render_pass(r, result);
@@ -1703,7 +1703,7 @@ sf_graphics_vulkan_create_device(struct sf_graphics_renderer *r, struct sf_graph
 	info.ppEnabledExtensionNames = description->vk_device_extensions;
 	info.pEnabledFeatures	     = &features;
 
-	if (SF_VULKAN_CHECK(vkCreateDevice(r->vk_physical_device, &info, r->vk_allocation_callbacks, &r->vk_device))) r->vk_device = VK_NULL_HANDLE;
+	if (!SF_VULKAN_CHECK(vkCreateDevice(r->vk_physical_device, &info, r->vk_allocation_callbacks, &r->vk_device))) r->vk_device = VK_NULL_HANDLE;
 }
 
 sf_private void
@@ -1717,6 +1717,8 @@ sf_graphics_vulkan_create_command_buffers(struct sf_graphics_renderer *r) {
 	u32 i	  = 0;
 	u32 count = SF_GRAPHICS_MAX_FRAMES_IN_FLIGHT_COUNT;
 
+	r->main_command_buffer_count = 0;
+
 	for (i = 0; i < SF_GRAPHICS_MAX_FRAMES_IN_FLIGHT_COUNT; ++i) {
 		r->main_command_buffers[i] = sf_graphics_create_command_buffer(r, SF_FALSE);
 		if (sf_graphics_is_null_handle(r->main_command_buffers[i])) return;
@@ -1729,6 +1731,8 @@ sf_private void
 sf_graphics_vulkan_create_image_acquired_semaphores(struct sf_graphics_renderer *r) {
 	u32 i	  = 0;
 	u32 count = r->main_command_buffer_count;
+
+	r->vk_image_acquired_semaphore_count = 0;
 
 	for (i = 0; i < count; ++i) {
 		VkSemaphoreCreateInfo info = {0};
@@ -1750,6 +1754,8 @@ sf_graphics_vulkan_create_draw_complete_semaphores(struct sf_graphics_renderer *
 	u32 i	  = 0;
 	u32 count = r->vk_swapchain_image_count;
 
+	r->vk_draw_complete_semaphore_count = 0;
+
 	for (i = 0; i < count; ++i) {
 		VkSemaphoreCreateInfo info = {0};
 
@@ -1770,7 +1776,9 @@ sf_graphics_vulkan_create_in_flight_fences(struct sf_graphics_renderer *r) {
 	u32 i	  = 0;
 	u32 count = r->main_command_buffer_count;
 
-	for (i = 0; count; ++i) {
+	r->vk_in_flight_fence_count = 0;
+
+	for (i = 0; i < count; ++i) {
 		VkFenceCreateInfo info = {0};
 
 		info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
@@ -1831,12 +1839,13 @@ sf_graphics_create_renderer(struct sf_arena *arena, struct sf_graphics_renderer_
 	sf_graphics_vulkan_create_image_acquired_semaphores(r);
 	if (!r->vk_image_acquired_semaphore_count) goto error;
 
-	sf_graphics_vulkan_create_image_acquired_semaphores(r);
+	sf_graphics_vulkan_create_draw_complete_semaphores(r);
 	if (!r->vk_image_acquired_semaphore_count) goto error;
 
 	sf_graphics_vulkan_create_in_flight_fences(r);
 	if (!r->vk_in_flight_fence_count) goto error;
 
+	r->swapchain_requested_image_count = SF_GRAPHICS_MAX_SWAPCHAIN_IMAGE_COUNT;
 	sf_graphics_vulkan_create_swapchain_resources(r);
 	if (!r->vk_swapchain) goto error;
 
@@ -1989,12 +1998,12 @@ sf_graphics_begin_frame(struct sf_graphics_renderer *r) {
 
 	vkCmdBeginRenderPass(current_command_buffer->vk_command_buffer, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
 
-	viewport.x	  = 0;
-	viewport.y	  = 0;
-	viewport.width	  = current_render_target->width;
-	viewport.height	  = current_render_target->height;
+	viewport.x	  = 0.0F;
+	viewport.y	  = 0.0F;
+	viewport.width	  = (float)current_render_target->width;
+	viewport.height	  = (float)current_render_target->height;
 	viewport.minDepth = 0.0F;
-	viewport.maxDepth = .0F;
+	viewport.maxDepth = 0.0F;
 
 	vkCmdSetViewport(current_command_buffer->vk_command_buffer, 0, 1, &viewport);
 
