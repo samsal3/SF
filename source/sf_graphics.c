@@ -2185,7 +2185,11 @@ sf_graphics_glfw_platform_fill_renderer_description(
 
 	base_instance_extensions = glfwGetRequiredInstanceExtensions(&base_instance_extension_count);
 
+#ifdef __APPLE__
+	required_instance_extension_count   = base_instance_extension_count + 2;
+#else
 	required_instance_extension_count   = base_instance_extension_count + 1;
+#endif
 	description->vk_instance_extensions = sf_arena_allocate(arena, (required_instance_extension_count) * sizeof(char const *));
 	if (description->vk_instance_extensions) {
 		u32 i					 = 0;
@@ -2194,7 +2198,11 @@ sf_graphics_glfw_platform_fill_renderer_description(
 		for (i = 0; i < base_instance_extension_count; ++i)
 			description->vk_instance_extensions[i] = base_instance_extensions[i];
 
-		description->vk_instance_extensions[base_instance_extension_count] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
+
+		description->vk_instance_extensions[base_instance_extension_count + 0] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
+#ifdef __APPLE__
+		description->vk_instance_extensions[base_instance_extension_count + 1] = "VK_KHR_portability_enumeration";
+#endif
 	}
 
 	description->vk_instance_layer_count = SF_SIZE(validation_layers);
