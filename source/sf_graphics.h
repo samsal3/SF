@@ -3,8 +3,8 @@
 
 #include "sf_core.h"
 
-#include <vulkan/vulkan.h>
 #include <GLFW/glfw3.h>
+#include <vulkan/vulkan.h>
 
 #define SF_GRAPHICS_MAX_GARBAGE_ITEM_COUNT 64
 #define SF_GRAPHICS_MAX_FRAMES_IN_FLIGHT_COUNT 3
@@ -109,7 +109,7 @@ struct sf_graphics_descriptor {
 };
 
 struct sf_graphics_descriptor_set_layout {
-	VkDescriptorSetLayout vk_layout;
+	VkDescriptorSetLayout	      vk_layout;
 	u32			      descriptor_count;
 	struct sf_graphics_descriptor descriptors[SF_GRAPHICS_MAX_DESCRIPTOR_SET_DESCRIPTOR_COUNT];
 };
@@ -128,7 +128,7 @@ struct sf_graphics_vertex_attribute {
 };
 
 struct sf_graphics_vertex_layout {
-	u64 stride;
+	u64				    stride;
 	u32				    attribute_count;
 	struct sf_graphics_vertex_attribute attributes[SF_GRAPHICS_MAX_VERTEX_LAYOUT_ATTRIBUTE_COUNT];
 };
@@ -329,10 +329,10 @@ sf_graphics_destroy_render_target(struct sf_graphics_renderer *renderer, sf_hand
 sf_public sf_handle
 sf_graphics_create_pipeline(
     struct sf_graphics_renderer *	      renderer,
-    sf_bool enable_depth,
+    sf_bool				      enable_depth,
     struct sf_graphics_vertex_layout *	      vertex_layout,
     struct sf_graphics_descriptor_set_layout *descriptor_set_layout,
-    struct sf_graphics_render_target *target,
+    struct sf_graphics_render_target *	      target,
     u32					      vertex_code_size,
     void const *			      vertex_code,
     u32					      fragment_code_size,

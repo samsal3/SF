@@ -1739,7 +1739,7 @@ sf_graphics_create_pipeline(
     sf_bool				      enable_depth,
     struct sf_graphics_vertex_layout *	      vertex_layout,
     struct sf_graphics_descriptor_set_layout *descriptor_set_layout,
-    struct sf_graphics_render_target *target,
+    struct sf_graphics_render_target *	      target,
     u32					      vertex_code_size,
     void const *			      vertex_code,
     u32					      fragment_code_size,
@@ -1760,7 +1760,7 @@ sf_graphics_create_pipeline(
 	VkPipelineDepthStencilStateCreateInfo		 depth_stencil_info	= {0};
 	VkDynamicState					 dynamic_states[]	= {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
 	VkPipelineDynamicStateCreateInfo		 dynamic_info		= {0};
-	VkGraphicsPipelineCreateInfo info = {0};
+	VkGraphicsPipelineCreateInfo			 info			= {0};
 
 	if (!r) return SF_NULL_HANDLE;
 
@@ -1891,50 +1891,51 @@ sf_graphics_create_pipeline(
 	depth_stencil_info.depthCompareOp	 = VK_COMPARE_OP_LESS;
 	depth_stencil_info.depthBoundsTestEnable = VK_FALSE;
 	depth_stencil_info.stencilTestEnable	 = VK_FALSE;
-	depth_stencil_info.front.failOp	     = VK_STENCIL_OP_KEEP;
-	depth_stencil_info.front.passOp	     = VK_STENCIL_OP_KEEP;
-	depth_stencil_info.front.depthFailOp = VK_STENCIL_OP_KEEP;
-	depth_stencil_info.front.compareOp   = VK_COMPARE_OP_NEVER;
-	depth_stencil_info.front.compareMask = 0;
-	depth_stencil_info.front.writeMask   = 0;
-	depth_stencil_info.front.reference   = 0;
-	depth_stencil_info.back.failOp	     = VK_STENCIL_OP_KEEP;
-	depth_stencil_info.back.passOp	     = VK_STENCIL_OP_KEEP;
-	depth_stencil_info.back.depthFailOp  = VK_STENCIL_OP_KEEP;
-	depth_stencil_info.back.compareOp    = VK_COMPARE_OP_NEVER;
-	depth_stencil_info.back.compareMask  = 0;
-	depth_stencil_info.back.writeMask    = 0;
-	depth_stencil_info.back.reference    = 0;
-	depth_stencil_info.minDepthBounds    = 0.0F;
-	depth_stencil_info.maxDepthBounds    = 0.0F;
+	depth_stencil_info.front.failOp		 = VK_STENCIL_OP_KEEP;
+	depth_stencil_info.front.passOp		 = VK_STENCIL_OP_KEEP;
+	depth_stencil_info.front.depthFailOp	 = VK_STENCIL_OP_KEEP;
+	depth_stencil_info.front.compareOp	 = VK_COMPARE_OP_NEVER;
+	depth_stencil_info.front.compareMask	 = 0;
+	depth_stencil_info.front.writeMask	 = 0;
+	depth_stencil_info.front.reference	 = 0;
+	depth_stencil_info.back.failOp		 = VK_STENCIL_OP_KEEP;
+	depth_stencil_info.back.passOp		 = VK_STENCIL_OP_KEEP;
+	depth_stencil_info.back.depthFailOp	 = VK_STENCIL_OP_KEEP;
+	depth_stencil_info.back.compareOp	 = VK_COMPARE_OP_NEVER;
+	depth_stencil_info.back.compareMask	 = 0;
+	depth_stencil_info.back.writeMask	 = 0;
+	depth_stencil_info.back.reference	 = 0;
+	depth_stencil_info.minDepthBounds	 = 0.0F;
+	depth_stencil_info.maxDepthBounds	 = 0.0F;
 
-	dynamic_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-	dynamic_info.pNext = NULL;
-	dynamic_info.flags = 0;
+	dynamic_info.sType	       = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+	dynamic_info.pNext	       = NULL;
+	dynamic_info.flags	       = 0;
 	dynamic_info.dynamicStateCount = SF_SIZE(dynamic_states);
-	dynamic_info.pDynamicStates = dynamic_states;
+	dynamic_info.pDynamicStates    = dynamic_states;
 
-	info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-	info.pNext = NULL;
-	info.flags = 0;
-	info.stageCount = SF_SIZE(stages);
-	info.pStages = stages;
+	info.sType	       = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+	info.pNext	       = NULL;
+	info.flags	       = 0;
+	info.stageCount	       = SF_SIZE(stages);
+	info.pStages	       = stages;
 	info.pVertexInputState = &vertex_info;
 	info.pInputAssemblyState;
-	info.pTessellationState = NULL;
-	info.pViewportState = &viewport_info;
+	info.pTessellationState	 = NULL;
+	info.pViewportState	 = &viewport_info;
 	info.pRasterizationState = &rasterization_info;
-	info.pMultisampleState = &multisample_info;
-	info.pDepthStencilState = &depth_stencil_info;
-	info.pColorBlendState = &color_blend_info;
-	info.pDynamicState = &dynamic_info;
-	info.layout = pipeline->vk_pipeline_layout;
-	info.renderPass = target->vk_render_pass;
-	info.subpass = 0;
-	info.basePipelineHandle = VK_NULL_HANDLE;
-	info.basePipelineIndex = -1;
+	info.pMultisampleState	 = &multisample_info;
+	info.pDepthStencilState	 = &depth_stencil_info;
+	info.pColorBlendState	 = &color_blend_info;
+	info.pDynamicState	 = &dynamic_info;
+	info.layout		 = pipeline->vk_pipeline_layout;
+	info.renderPass		 = target->vk_render_pass;
+	info.subpass		 = 0;
+	info.basePipelineHandle	 = VK_NULL_HANDLE;
+	info.basePipelineIndex	 = -1;
 
-	if (!SF_VULKAN_CHECK(vkCreateGraphicsPipelines(r->vk_device, VK_NULL_HANDLE, 1, &info, r->vk_allocation_callbacks, &pipeline->vk_pipeline))) {
+	if (!SF_VULKAN_CHECK(
+		vkCreateGraphicsPipelines(r->vk_device, VK_NULL_HANDLE, 1, &info, r->vk_allocation_callbacks, &pipeline->vk_pipeline))) {
 		pipeline->vk_pipeline = VK_NULL_HANDLE;
 		goto error;
 	}
