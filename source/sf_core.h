@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define SF_OFFSET_OF(type, name) ((intptr_t)&(((type *)NULL)->name))
+#define SF_OFFSET_OF(type, name) ((intptr_t) & (((type *)NULL)->name))
 #define SF_SIZE(a) (sizeof(a) / sizeof(0 [a]))
 #define SF_MIN(a, b) ((a) < (b) ? (a) : (b))
 #define SF_MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -15,25 +15,22 @@
 #define NULL ((void *)0)
 #endif
 
-#define SF_ARRAY_INIT(a, value)                     \
-	do {                                        \
-		size_t i_;                          \
-		for (i_ = 0; i_ < SF_SIZE(a); ++i_) \
-			(a)[i_] = value;            \
+#define SF_ARRAY_INIT(a, value)                                      \
+	do {                                                         \
+		size_t i_;                                           \
+		for (i_ = 0; i_ < SF_SIZE(a); ++i_) (a)[i_] = value; \
 	} while (0)
 
-#define SF_MEMORY_COPY(destination, source, size)                                   \
-	do {                                                                        \
-		u64 i;                                                              \
-		for (i = 0; i < size; ++i)                                          \
-			((sf_byte *)destination)[i] = ((sf_byte const *)source)[i]; \
+#define SF_MEMORY_COPY(destination, source, size)                                                           \
+	do {                                                                                                \
+		u64 i_;                                                                                     \
+		for (i_ = 0; i_ < size; ++i_) ((sf_byte *)destination)[i_] = ((sf_byte const *)source)[i_]; \
 	} while (0)
 
-#define SF_MEMORY_SET(destination, source, size)                        \
-	do {                                                            \
-		u64 i;                                                  \
-		for (i = 0; i < size; ++i)                              \
-			((sf_byte *)destination)[i] = ((sf_byte)value); \
+#define SF_MEMORY_SET(destination, value, size)                                                \
+	do {                                                                                   \
+		u64 i_;                                                                        \
+		for (i_ = 0; i_ < size; ++i_) ((sf_byte *)destination)[i_] = ((sf_byte)value); \
 	} while (0)
 
 #define SF_STRING_LITERAL(source, s)            \
@@ -97,8 +94,9 @@ sf_u64_align(u64 value, u64 alignment) {
 
 sf_public void *
 sf_arena_allocate(struct sf_arena *arena, u64 size) {
-	sf_byte *memory = NULL;
-	u64	 i = 0, required_size = 0;
+	sf_byte *memory	       = NULL;
+	u64	 i	       = 0;
+	u64	 required_size = 0;
 
 	if (!arena || !size) return NULL;
 
@@ -108,8 +106,7 @@ sf_arena_allocate(struct sf_arena *arena, u64 size) {
 	memory		= &arena->data[arena->position];
 	arena->position = sf_u64_align(required_size, arena->alignment);
 
-	for (i = 0; i < size; ++i)
-		memory[i] = 0x0;
+	for (i = 0; i < size; ++i) memory[i] = 0x0;
 
 	return memory;
 }

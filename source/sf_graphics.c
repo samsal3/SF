@@ -2,9 +2,6 @@
 
 #include <stdio.h>
 
-#define SF_POW(b, p) pow(b, p)
-#define SF_SNPRINTF snprintf
-
 sf_private struct sf_graphics_texture *
 sf_graphics_get_texture_from_resource_pool(struct sf_graphics_renderer *r) {
 	u32 i = 0;
@@ -108,6 +105,7 @@ sf_graphics_get_pipeline_from_resource_pool(struct sf_graphics_renderer *r) {
 		struct sf_graphics_pipeline *current = &r->pipeline_pool[i];
 
 		if (!current->is_occupied) {
+			SF_MEMORY_SET(current, 0, sizeof(*current));
 			current->is_occupied = SF_TRUE;
 			return current;
 		}
@@ -135,33 +133,83 @@ sf_graphics_string_from_vulkan_result(VkResult vk_result) {
 	char const *result = NULL;
 
 	switch (vk_result) {
-		case VK_SUCCESS:			result = "VK_SUCCESS"; break;
-		case VK_NOT_READY:			result = "VK_NOT_READY"; break;
-		case VK_TIMEOUT:			result = "VK_TIMEOUT"; break;
-		case VK_EVENT_SET:			result = "VK_EVENT_SET"; break;
-		case VK_EVENT_RESET:			result = "VK_EVENT_RESET"; break;
-		case VK_INCOMPLETE:			result = "VK_INCOMPLETE"; break;
-		case VK_ERROR_OUT_OF_HOST_MEMORY:	result = "VK_ERROR_OUT_OF_HOST_MEMORY"; break;
-		case VK_ERROR_OUT_OF_DEVICE_MEMORY:	result = "VK_ERROR_OUT_OF_DEVICE_MEMORY"; break;
-		case VK_ERROR_INITIALIZATION_FAILED:	result = "VK_ERROR_INITIALIZATION_FAILED"; break;
-		case VK_ERROR_DEVICE_LOST:		result = "VK_ERROR_DEVICE_LOST"; break;
-		case VK_ERROR_MEMORY_MAP_FAILED:	result = "VK_ERROR_MEMORY_MAP_FAILED"; break;
-		case VK_ERROR_LAYER_NOT_PRESENT:	result = "VK_ERROR_LAYER_NOT_PRESENT"; break;
-		case VK_ERROR_EXTENSION_NOT_PRESENT:	result = "VK_ERROR_EXTENSION_NOT_PRESENT"; break;
-		case VK_ERROR_FEATURE_NOT_PRESENT:	result = "VK_ERROR_FEATURE_NOT_PRESENT"; break;
-		case VK_ERROR_INCOMPATIBLE_DRIVER:	result = "VK_ERROR_INCOMPATIBLE_DRIVER"; break;
-		case VK_ERROR_TOO_MANY_OBJECTS:		result = "VK_ERROR_TOO_MANY_OBJECTS"; break;
-		case VK_ERROR_FORMAT_NOT_SUPPORTED:	result = "VK_ERROR_FORMAT_NOT_SUPPORTED"; break;
-		case VK_ERROR_FRAGMENTED_POOL:		result = "VK_ERROR_FRAGMENTED_POOL"; break;
-		case VK_ERROR_OUT_OF_POOL_MEMORY:	result = "VK_ERROR_OUT_OF_POOL_MEMORY"; break;
-		case VK_ERROR_INVALID_EXTERNAL_HANDLE:	result = "VK_ERROR_INVALID_EXTERNAL_HANDLE"; break;
-		case VK_ERROR_SURFACE_LOST_KHR:		result = "VK_ERROR_SURFACE_LOST_KHR"; break;
-		case VK_ERROR_NATIVE_WINDOW_IN_USE_KHR: result = "VK_ERROR_NATIVE_WINDOW_IN_USE_KHR"; break;
-		case VK_SUBOPTIMAL_KHR:			result = "VK_SUBOPTIMAL_KHR"; break;
-		case VK_ERROR_OUT_OF_DATE_KHR:		result = "VK_ERROR_OUT_OF_DATE_KHR"; break;
+		case VK_SUCCESS:
+			result = "VK_SUCCESS";
+			break;
+		case VK_NOT_READY:
+			result = "VK_NOT_READY";
+			break;
+		case VK_TIMEOUT:
+			result = "VK_TIMEOUT";
+			break;
+		case VK_EVENT_SET:
+			result = "VK_EVENT_SET";
+			break;
+		case VK_EVENT_RESET:
+			result = "VK_EVENT_RESET";
+			break;
+		case VK_INCOMPLETE:
+			result = "VK_INCOMPLETE";
+			break;
+		case VK_ERROR_OUT_OF_HOST_MEMORY:
+			result = "VK_ERROR_OUT_OF_HOST_MEMORY";
+			break;
+		case VK_ERROR_OUT_OF_DEVICE_MEMORY:
+			result = "VK_ERROR_OUT_OF_DEVICE_MEMORY";
+			break;
+		case VK_ERROR_INITIALIZATION_FAILED:
+			result = "VK_ERROR_INITIALIZATION_FAILED";
+			break;
+		case VK_ERROR_DEVICE_LOST:
+			result = "VK_ERROR_DEVICE_LOST";
+			break;
+		case VK_ERROR_MEMORY_MAP_FAILED:
+			result = "VK_ERROR_MEMORY_MAP_FAILED";
+			break;
+		case VK_ERROR_LAYER_NOT_PRESENT:
+			result = "VK_ERROR_LAYER_NOT_PRESENT";
+			break;
+		case VK_ERROR_EXTENSION_NOT_PRESENT:
+			result = "VK_ERROR_EXTENSION_NOT_PRESENT";
+			break;
+		case VK_ERROR_FEATURE_NOT_PRESENT:
+			result = "VK_ERROR_FEATURE_NOT_PRESENT";
+			break;
+		case VK_ERROR_INCOMPATIBLE_DRIVER:
+			result = "VK_ERROR_INCOMPATIBLE_DRIVER";
+			break;
+		case VK_ERROR_TOO_MANY_OBJECTS:
+			result = "VK_ERROR_TOO_MANY_OBJECTS";
+			break;
+		case VK_ERROR_FORMAT_NOT_SUPPORTED:
+			result = "VK_ERROR_FORMAT_NOT_SUPPORTED";
+			break;
+		case VK_ERROR_FRAGMENTED_POOL:
+			result = "VK_ERROR_FRAGMENTED_POOL";
+			break;
+		case VK_ERROR_OUT_OF_POOL_MEMORY:
+			result = "VK_ERROR_OUT_OF_POOL_MEMORY";
+			break;
+		case VK_ERROR_INVALID_EXTERNAL_HANDLE:
+			result = "VK_ERROR_INVALID_EXTERNAL_HANDLE";
+			break;
+		case VK_ERROR_SURFACE_LOST_KHR:
+			result = "VK_ERROR_SURFACE_LOST_KHR";
+			break;
+		case VK_ERROR_NATIVE_WINDOW_IN_USE_KHR:
+			result = "VK_ERROR_NATIVE_WINDOW_IN_USE_KHR";
+			break;
+		case VK_SUBOPTIMAL_KHR:
+			result = "VK_SUBOPTIMAL_KHR";
+			break;
+		case VK_ERROR_OUT_OF_DATE_KHR:
+			result = "VK_ERROR_OUT_OF_DATE_KHR";
+			break;
 
 		case VK_ERROR_UNKNOWN:
-		default:	       result = "VK_ERROR_UNKNOWN"; break;
+		default:
+			result = "VK_ERROR_UNKNOWN";
+			break;
 	}
 
 	return result;
@@ -181,8 +229,7 @@ sf_graphics_vulkan_log(
     VkDebugUtilsMessageSeverityFlagBitsEXT	messageSeverity,
     VkDebugUtilsMessageTypeFlagsEXT		messageTypes,
     const VkDebugUtilsMessengerCallbackDataEXT *callbackData,
-    void				       *userData
-) {
+    void *					userData) {
 	(void)messageTypes;
 	(void)userData;
 
@@ -191,7 +238,9 @@ sf_graphics_vulkan_log(
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
 		case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
-		default:					      fprintf(stderr, "%s\n", callbackData->pMessage); break;
+		default:
+			fprintf(stderr, "%s\n", callbackData->pMessage);
+			break;
 	}
 
 	return VK_TRUE;
@@ -208,7 +257,10 @@ struct sf_graphics_queue_family_property_list {
 };
 
 sf_private void
-sf_graphics_create_queue_family_property_list(struct sf_arena *arena, VkPhysicalDevice device, struct sf_graphics_queue_family_property_list *list) {
+sf_graphics_create_queue_family_property_list(
+    struct sf_arena *				   arena,
+    VkPhysicalDevice				   device,
+    struct sf_graphics_queue_family_property_list *list) {
 	if (!arena || !device || !list) return;
 
 	vkGetPhysicalDeviceQueueFamilyProperties(device, &list->size, NULL);
@@ -244,7 +296,10 @@ struct sf_graphics_extension_property_list {
 };
 
 sf_private void
-sf_graphics_create_extension_property_list(struct sf_arena *arena, VkPhysicalDevice device, struct sf_graphics_extension_property_list *list) {
+sf_graphics_create_extension_property_list(
+    struct sf_arena *				arena,
+    VkPhysicalDevice				device,
+    struct sf_graphics_extension_property_list *list) {
 	if (!arena || !device || !list) return;
 
 	if (!SF_VULKAN_CHECK(vkEnumerateDeviceExtensionProperties(device, NULL, &list->size, NULL))) return;
@@ -257,10 +312,9 @@ sf_graphics_create_extension_property_list(struct sf_arena *arena, VkPhysicalDev
 
 sf_private sf_bool
 sf_graphics_check_device_extension_support(
-    struct sf_arena			    *arena,
-    struct sf_graphics_renderer		    *r,
-    struct sf_graphics_renderer_description *description
-) {
+    struct sf_arena *			     arena,
+    struct sf_graphics_renderer *	     r,
+    struct sf_graphics_renderer_description *description) {
 	u32					   i	     = 0;
 	sf_bool					   found_all = SF_TRUE;
 	struct sf_graphics_extension_property_list available = {0};
@@ -304,11 +358,10 @@ struct sf_graphics_surface_format_list {
 
 sf_private void
 sf_graphics_create_surface_format_list(
-    struct sf_arena			   *arena,
+    struct sf_arena *			    arena,
     VkPhysicalDevice			    device,
     VkSurfaceKHR			    surface,
-    struct sf_graphics_surface_format_list *list
-) {
+    struct sf_graphics_surface_format_list *list) {
 	if (!arena || !device || !surface) return;
 
 	if (!SF_VULKAN_CHECK(vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &list->size, NULL))) return;
@@ -326,11 +379,10 @@ struct sf_graphics_present_mode_list {
 
 sf_private void
 sf_graphics_create_present_mode_list(
-    struct sf_arena			 *arena,
+    struct sf_arena *			  arena,
     VkPhysicalDevice			  device,
     VkSurfaceKHR			  surface,
-    struct sf_graphics_present_mode_list *list
-) {
+    struct sf_graphics_present_mode_list *list) {
 	if (!arena || !device || !surface || !list) return;
 
 	if (!SF_VULKAN_CHECK(vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &list->size, NULL))) return;
@@ -353,7 +405,8 @@ sf_graphics_test_format_features(VkPhysicalDevice device, struct sf_graphics_for
 	vkGetPhysicalDeviceFormatProperties(device, test->format, &properties);
 
 	if (VK_IMAGE_TILING_LINEAR == test->tiling) return !!(properties.linearTilingFeatures & test->features);
-	else if (VK_IMAGE_TILING_OPTIMAL == test->tiling) return !!(properties.optimalTilingFeatures & test->features);
+	else if (VK_IMAGE_TILING_OPTIMAL == test->tiling)
+		return !!(properties.optimalTilingFeatures & test->features);
 
 	return SF_FALSE;
 }
@@ -434,11 +487,21 @@ sf_graphics_vulkan_image_view_type_from_texture_type(enum sf_graphics_texture_ty
 	VkImageViewType result = VK_IMAGE_VIEW_TYPE_1D;
 
 	switch (type) {
-		case SF_GRAPHICS_TEXTURE_TYPE_1D:   result = VK_IMAGE_VIEW_TYPE_1D; break;
-		case SF_GRAPHICS_TEXTURE_TYPE_2D:   result = VK_IMAGE_VIEW_TYPE_2D; break;
-		case SF_GRAPHICS_TEXTURE_TYPE_3D:   result = VK_IMAGE_VIEW_TYPE_3D; break;
-		case SF_GRAPHICS_TEXTURE_TYPE_CUBE: result = VK_IMAGE_VIEW_TYPE_CUBE; break;
-		default:			    result = VK_IMAGE_VIEW_TYPE_2D; break;
+		case SF_GRAPHICS_TEXTURE_TYPE_1D:
+			result = VK_IMAGE_VIEW_TYPE_1D;
+			break;
+		case SF_GRAPHICS_TEXTURE_TYPE_2D:
+			result = VK_IMAGE_VIEW_TYPE_2D;
+			break;
+		case SF_GRAPHICS_TEXTURE_TYPE_3D:
+			result = VK_IMAGE_VIEW_TYPE_3D;
+			break;
+		case SF_GRAPHICS_TEXTURE_TYPE_CUBE:
+			result = VK_IMAGE_VIEW_TYPE_CUBE;
+			break;
+		default:
+			result = VK_IMAGE_VIEW_TYPE_2D;
+			break;
 	}
 
 	return result;
@@ -449,11 +512,21 @@ sf_graphics_vulkan_image_type_from_texture_type(enum sf_graphics_texture_type ty
 	VkImageType result = VK_IMAGE_TYPE_1D;
 
 	switch (type) {
-		case SF_GRAPHICS_TEXTURE_TYPE_1D:   result = VK_IMAGE_TYPE_1D; break;
-		case SF_GRAPHICS_TEXTURE_TYPE_2D:   result = VK_IMAGE_TYPE_2D; break;
-		case SF_GRAPHICS_TEXTURE_TYPE_3D:   result = VK_IMAGE_TYPE_3D; break;
-		case SF_GRAPHICS_TEXTURE_TYPE_CUBE: result = VK_IMAGE_TYPE_2D; break;
-		default:			    result = VK_IMAGE_TYPE_2D; break;
+		case SF_GRAPHICS_TEXTURE_TYPE_1D:
+			result = VK_IMAGE_TYPE_1D;
+			break;
+		case SF_GRAPHICS_TEXTURE_TYPE_2D:
+			result = VK_IMAGE_TYPE_2D;
+			break;
+		case SF_GRAPHICS_TEXTURE_TYPE_3D:
+			result = VK_IMAGE_TYPE_3D;
+			break;
+		case SF_GRAPHICS_TEXTURE_TYPE_CUBE:
+			result = VK_IMAGE_TYPE_2D;
+			break;
+		default:
+			result = VK_IMAGE_TYPE_2D;
+			break;
 	}
 
 	return result;
@@ -465,41 +538,103 @@ sf_graphics_vulkan_format_from_format(enum sf_graphics_format format) {
 
 	switch (format) {
 		// 1 channel
-		case SF_GRAPHICS_FORMAT_R8_UNORM:	     result = VK_FORMAT_R8_UNORM; break;
-		case SF_GRAPHICS_FORMAT_R16_UNORM:	     result = VK_FORMAT_R16_UNORM; break;
-		case SF_GRAPHICS_FORMAT_R16_UINT:	     result = VK_FORMAT_R16_UINT; break;
-		case SF_GRAPHICS_FORMAT_R16_SFLOAT:	     result = VK_FORMAT_R16_SFLOAT; break;
-		case SF_GRAPHICS_FORMAT_R32_UINT:	     result = VK_FORMAT_R32_UINT; break;
-		case SF_GRAPHICS_FORMAT_R32_SFLOAT:	     result = VK_FORMAT_R32_SFLOAT; break;
+		case SF_GRAPHICS_FORMAT_R8_UNORM:
+			result = VK_FORMAT_R8_UNORM;
+			break;
+		case SF_GRAPHICS_FORMAT_R16_UNORM:
+			result = VK_FORMAT_R16_UNORM;
+			break;
+		case SF_GRAPHICS_FORMAT_R16_UINT:
+			result = VK_FORMAT_R16_UINT;
+			break;
+		case SF_GRAPHICS_FORMAT_R16_SFLOAT:
+			result = VK_FORMAT_R16_SFLOAT;
+			break;
+		case SF_GRAPHICS_FORMAT_R32_UINT:
+			result = VK_FORMAT_R32_UINT;
+			break;
+		case SF_GRAPHICS_FORMAT_R32_SFLOAT:
+			result = VK_FORMAT_R32_SFLOAT;
+			break;
 		// 2 channel
-		case SF_GRAPHICS_FORMAT_R8G8_UNORM:	     result = VK_FORMAT_R8G8_UNORM; break;
-		case SF_GRAPHICS_FORMAT_R16G16_UNORM:	     result = VK_FORMAT_R16G16_UNORM; break;
-		case SF_GRAPHICS_FORMAT_R16G16_SFLOAT:	     result = VK_FORMAT_R16G16_SFLOAT; break;
-		case SF_GRAPHICS_FORMAT_R32G32_UINT:	     result = VK_FORMAT_R32G32_UINT; break;
-		case SF_GRAPHICS_FORMAT_R32G32_SFLOAT:	     result = VK_FORMAT_R32G32_SFLOAT; break;
+		case SF_GRAPHICS_FORMAT_R8G8_UNORM:
+			result = VK_FORMAT_R8G8_UNORM;
+			break;
+		case SF_GRAPHICS_FORMAT_R16G16_UNORM:
+			result = VK_FORMAT_R16G16_UNORM;
+			break;
+		case SF_GRAPHICS_FORMAT_R16G16_SFLOAT:
+			result = VK_FORMAT_R16G16_SFLOAT;
+			break;
+		case SF_GRAPHICS_FORMAT_R32G32_UINT:
+			result = VK_FORMAT_R32G32_UINT;
+			break;
+		case SF_GRAPHICS_FORMAT_R32G32_SFLOAT:
+			result = VK_FORMAT_R32G32_SFLOAT;
+			break;
 		// 3 channel
-		case SF_GRAPHICS_FORMAT_R8G8B8_UNORM:	     result = VK_FORMAT_R8G8B8_UNORM; break;
-		case SF_GRAPHICS_FORMAT_R16G16B16_UNORM:     result = VK_FORMAT_R16G16B16_UNORM; break;
-		case SF_GRAPHICS_FORMAT_R16G16B16_SFLOAT:    result = VK_FORMAT_R16G16B16_SFLOAT; break;
-		case SF_GRAPHICS_FORMAT_R32G32B32_UINT:	     result = VK_FORMAT_R32G32B32_UINT; break;
-		case SF_GRAPHICS_FORMAT_R32G32B32_SFLOAT:    result = VK_FORMAT_R32G32B32_SFLOAT; break;
+		case SF_GRAPHICS_FORMAT_R8G8B8_UNORM:
+			result = VK_FORMAT_R8G8B8_UNORM;
+			break;
+		case SF_GRAPHICS_FORMAT_R16G16B16_UNORM:
+			result = VK_FORMAT_R16G16B16_UNORM;
+			break;
+		case SF_GRAPHICS_FORMAT_R16G16B16_SFLOAT:
+			result = VK_FORMAT_R16G16B16_SFLOAT;
+			break;
+		case SF_GRAPHICS_FORMAT_R32G32B32_UINT:
+			result = VK_FORMAT_R32G32B32_UINT;
+			break;
+		case SF_GRAPHICS_FORMAT_R32G32B32_SFLOAT:
+			result = VK_FORMAT_R32G32B32_SFLOAT;
+			break;
 		// 4 channel
-		case SF_GRAPHICS_FORMAT_B8G8R8A8_UNORM:	     result = VK_FORMAT_B8G8R8A8_UNORM; break;
-		case SF_GRAPHICS_FORMAT_B8G8R8A8_SRGB:	     result = VK_FORMAT_B8G8R8A8_SRGB; break;
-		case SF_GRAPHICS_FORMAT_R8G8B8A8_UNORM:	     result = VK_FORMAT_R8G8B8A8_UNORM; break;
-		case SF_GRAPHICS_FORMAT_R16G16B16A16_UNORM:  result = VK_FORMAT_R16G16B16A16_UNORM; break;
-		case SF_GRAPHICS_FORMAT_R16G16B16A16_SFLOAT: result = VK_FORMAT_R16G16B16A16_SFLOAT; break;
-		case SF_GRAPHICS_FORMAT_R32G32B32A32_UINT:   result = VK_FORMAT_R32G32B32A32_UINT; break;
-		case SF_GRAPHICS_FORMAT_R32G32B32A32_SFLOAT: result = VK_FORMAT_R32G32B32A32_SFLOAT; break;
+		case SF_GRAPHICS_FORMAT_B8G8R8A8_UNORM:
+			result = VK_FORMAT_B8G8R8A8_UNORM;
+			break;
+		case SF_GRAPHICS_FORMAT_B8G8R8A8_SRGB:
+			result = VK_FORMAT_B8G8R8A8_SRGB;
+			break;
+		case SF_GRAPHICS_FORMAT_R8G8B8A8_UNORM:
+			result = VK_FORMAT_R8G8B8A8_UNORM;
+			break;
+		case SF_GRAPHICS_FORMAT_R16G16B16A16_UNORM:
+			result = VK_FORMAT_R16G16B16A16_UNORM;
+			break;
+		case SF_GRAPHICS_FORMAT_R16G16B16A16_SFLOAT:
+			result = VK_FORMAT_R16G16B16A16_SFLOAT;
+			break;
+		case SF_GRAPHICS_FORMAT_R32G32B32A32_UINT:
+			result = VK_FORMAT_R32G32B32A32_UINT;
+			break;
+		case SF_GRAPHICS_FORMAT_R32G32B32A32_SFLOAT:
+			result = VK_FORMAT_R32G32B32A32_SFLOAT;
+			break;
 		// Depth/stencil
-		case SF_GRAPHICS_FORMAT_D16_UNORM:	     result = VK_FORMAT_D16_UNORM; break;
-		case SF_GRAPHICS_FORMAT_X8_D24_UNORM_PACK32: result = VK_FORMAT_X8_D24_UNORM_PACK32; break;
-		case SF_GRAPHICS_FORMAT_D32_SFLOAT:	     result = VK_FORMAT_D32_SFLOAT; break;
-		case SF_GRAPHICS_FORMAT_S8_UINT:	     result = VK_FORMAT_S8_UINT; break;
-		case SF_GRAPHICS_FORMAT_D16_UNORM_S8_UINT:   result = VK_FORMAT_D16_UNORM_S8_UINT; break;
-		case SF_GRAPHICS_FORMAT_D24_UNORM_S8_UINT:   result = VK_FORMAT_D24_UNORM_S8_UINT; break;
-		case SF_GRAPHICS_FORMAT_D32_SFLOAT_S8_UINT:  result = VK_FORMAT_D32_SFLOAT_S8_UINT; break;
-		default:				     result = VK_FORMAT_UNDEFINED; break;
+		case SF_GRAPHICS_FORMAT_D16_UNORM:
+			result = VK_FORMAT_D16_UNORM;
+			break;
+		case SF_GRAPHICS_FORMAT_X8_D24_UNORM_PACK32:
+			result = VK_FORMAT_X8_D24_UNORM_PACK32;
+			break;
+		case SF_GRAPHICS_FORMAT_D32_SFLOAT:
+			result = VK_FORMAT_D32_SFLOAT;
+			break;
+		case SF_GRAPHICS_FORMAT_S8_UINT:
+			result = VK_FORMAT_S8_UINT;
+			break;
+		case SF_GRAPHICS_FORMAT_D16_UNORM_S8_UINT:
+			result = VK_FORMAT_D16_UNORM_S8_UINT;
+			break;
+		case SF_GRAPHICS_FORMAT_D24_UNORM_S8_UINT:
+			result = VK_FORMAT_D24_UNORM_S8_UINT;
+			break;
+		case SF_GRAPHICS_FORMAT_D32_SFLOAT_S8_UINT:
+			result = VK_FORMAT_D32_SFLOAT_S8_UINT;
+			break;
+		default:
+			result = VK_FORMAT_UNDEFINED;
+			break;
 	}
 
 	return result;
@@ -511,41 +646,103 @@ sf_graphics_format_from_vulkan_format(VkFormat format) {
 
 	switch (format) {
 		// 1 channel
-		case VK_FORMAT_R8_UNORM:	    result = SF_GRAPHICS_FORMAT_R8_UNORM; break;
-		case VK_FORMAT_R16_UNORM:	    result = SF_GRAPHICS_FORMAT_R16_UNORM; break;
-		case VK_FORMAT_R16_UINT:	    result = SF_GRAPHICS_FORMAT_R16_UINT; break;
-		case VK_FORMAT_R16_SFLOAT:	    result = SF_GRAPHICS_FORMAT_R16_SFLOAT; break;
-		case VK_FORMAT_R32_UINT:	    result = SF_GRAPHICS_FORMAT_R32_UINT; break;
-		case VK_FORMAT_R32_SFLOAT:	    result = SF_GRAPHICS_FORMAT_R32_SFLOAT; break;
+		case VK_FORMAT_R8_UNORM:
+			result = SF_GRAPHICS_FORMAT_R8_UNORM;
+			break;
+		case VK_FORMAT_R16_UNORM:
+			result = SF_GRAPHICS_FORMAT_R16_UNORM;
+			break;
+		case VK_FORMAT_R16_UINT:
+			result = SF_GRAPHICS_FORMAT_R16_UINT;
+			break;
+		case VK_FORMAT_R16_SFLOAT:
+			result = SF_GRAPHICS_FORMAT_R16_SFLOAT;
+			break;
+		case VK_FORMAT_R32_UINT:
+			result = SF_GRAPHICS_FORMAT_R32_UINT;
+			break;
+		case VK_FORMAT_R32_SFLOAT:
+			result = SF_GRAPHICS_FORMAT_R32_SFLOAT;
+			break;
 		// 2 channel
-		case VK_FORMAT_R8G8_UNORM:	    result = SF_GRAPHICS_FORMAT_R8G8_UNORM; break;
-		case VK_FORMAT_R16G16_UNORM:	    result = SF_GRAPHICS_FORMAT_R16G16_UNORM; break;
-		case VK_FORMAT_R16G16_SFLOAT:	    result = SF_GRAPHICS_FORMAT_R16G16_SFLOAT; break;
-		case VK_FORMAT_R32G32_UINT:	    result = SF_GRAPHICS_FORMAT_R32G32_UINT; break;
-		case VK_FORMAT_R32G32_SFLOAT:	    result = SF_GRAPHICS_FORMAT_R32G32_SFLOAT; break;
+		case VK_FORMAT_R8G8_UNORM:
+			result = SF_GRAPHICS_FORMAT_R8G8_UNORM;
+			break;
+		case VK_FORMAT_R16G16_UNORM:
+			result = SF_GRAPHICS_FORMAT_R16G16_UNORM;
+			break;
+		case VK_FORMAT_R16G16_SFLOAT:
+			result = SF_GRAPHICS_FORMAT_R16G16_SFLOAT;
+			break;
+		case VK_FORMAT_R32G32_UINT:
+			result = SF_GRAPHICS_FORMAT_R32G32_UINT;
+			break;
+		case VK_FORMAT_R32G32_SFLOAT:
+			result = SF_GRAPHICS_FORMAT_R32G32_SFLOAT;
+			break;
 		// 3 channel
-		case VK_FORMAT_R8G8B8_UNORM:	    result = SF_GRAPHICS_FORMAT_R8G8B8_UNORM; break;
-		case VK_FORMAT_R16G16B16_UNORM:	    result = SF_GRAPHICS_FORMAT_R16G16B16_UNORM; break;
-		case VK_FORMAT_R16G16B16_SFLOAT:    result = SF_GRAPHICS_FORMAT_R16G16B16_SFLOAT; break;
-		case VK_FORMAT_R32G32B32_UINT:	    result = SF_GRAPHICS_FORMAT_R32G32B32_UINT; break;
-		case VK_FORMAT_R32G32B32_SFLOAT:    result = SF_GRAPHICS_FORMAT_R32G32B32_SFLOAT; break;
+		case VK_FORMAT_R8G8B8_UNORM:
+			result = SF_GRAPHICS_FORMAT_R8G8B8_UNORM;
+			break;
+		case VK_FORMAT_R16G16B16_UNORM:
+			result = SF_GRAPHICS_FORMAT_R16G16B16_UNORM;
+			break;
+		case VK_FORMAT_R16G16B16_SFLOAT:
+			result = SF_GRAPHICS_FORMAT_R16G16B16_SFLOAT;
+			break;
+		case VK_FORMAT_R32G32B32_UINT:
+			result = SF_GRAPHICS_FORMAT_R32G32B32_UINT;
+			break;
+		case VK_FORMAT_R32G32B32_SFLOAT:
+			result = SF_GRAPHICS_FORMAT_R32G32B32_SFLOAT;
+			break;
 		// 4 channel
-		case VK_FORMAT_B8G8R8A8_UNORM:	    result = SF_GRAPHICS_FORMAT_B8G8R8A8_UNORM; break;
-		case VK_FORMAT_B8G8R8A8_SRGB:	    result = SF_GRAPHICS_FORMAT_B8G8R8A8_SRGB; break;
-		case VK_FORMAT_R8G8B8A8_UNORM:	    result = SF_GRAPHICS_FORMAT_R8G8B8A8_UNORM; break;
-		case VK_FORMAT_R16G16B16A16_UNORM:  result = SF_GRAPHICS_FORMAT_R16G16B16A16_UNORM; break;
-		case VK_FORMAT_R16G16B16A16_SFLOAT: result = SF_GRAPHICS_FORMAT_R16G16B16A16_SFLOAT; break;
-		case VK_FORMAT_R32G32B32A32_UINT:   result = SF_GRAPHICS_FORMAT_R32G32B32A32_UINT; break;
-		case VK_FORMAT_R32G32B32A32_SFLOAT: result = SF_GRAPHICS_FORMAT_R32G32B32A32_SFLOAT; break;
+		case VK_FORMAT_B8G8R8A8_UNORM:
+			result = SF_GRAPHICS_FORMAT_B8G8R8A8_UNORM;
+			break;
+		case VK_FORMAT_B8G8R8A8_SRGB:
+			result = SF_GRAPHICS_FORMAT_B8G8R8A8_SRGB;
+			break;
+		case VK_FORMAT_R8G8B8A8_UNORM:
+			result = SF_GRAPHICS_FORMAT_R8G8B8A8_UNORM;
+			break;
+		case VK_FORMAT_R16G16B16A16_UNORM:
+			result = SF_GRAPHICS_FORMAT_R16G16B16A16_UNORM;
+			break;
+		case VK_FORMAT_R16G16B16A16_SFLOAT:
+			result = SF_GRAPHICS_FORMAT_R16G16B16A16_SFLOAT;
+			break;
+		case VK_FORMAT_R32G32B32A32_UINT:
+			result = SF_GRAPHICS_FORMAT_R32G32B32A32_UINT;
+			break;
+		case VK_FORMAT_R32G32B32A32_SFLOAT:
+			result = SF_GRAPHICS_FORMAT_R32G32B32A32_SFLOAT;
+			break;
 		// Depth/stencil
-		case VK_FORMAT_D16_UNORM:	    result = SF_GRAPHICS_FORMAT_D16_UNORM; break;
-		case VK_FORMAT_X8_D24_UNORM_PACK32: result = SF_GRAPHICS_FORMAT_X8_D24_UNORM_PACK32; break;
-		case VK_FORMAT_D32_SFLOAT:	    result = SF_GRAPHICS_FORMAT_D32_SFLOAT; break;
-		case VK_FORMAT_S8_UINT:		    result = SF_GRAPHICS_FORMAT_S8_UINT; break;
-		case VK_FORMAT_D16_UNORM_S8_UINT:   result = SF_GRAPHICS_FORMAT_D16_UNORM_S8_UINT; break;
-		case VK_FORMAT_D24_UNORM_S8_UINT:   result = SF_GRAPHICS_FORMAT_D24_UNORM_S8_UINT; break;
-		case VK_FORMAT_D32_SFLOAT_S8_UINT:  result = SF_GRAPHICS_FORMAT_D32_SFLOAT_S8_UINT; break;
-		default:			    result = SF_GRAPHICS_FORMAT_UNDEFINED; break;
+		case VK_FORMAT_D16_UNORM:
+			result = SF_GRAPHICS_FORMAT_D16_UNORM;
+			break;
+		case VK_FORMAT_X8_D24_UNORM_PACK32:
+			result = SF_GRAPHICS_FORMAT_X8_D24_UNORM_PACK32;
+			break;
+		case VK_FORMAT_D32_SFLOAT:
+			result = SF_GRAPHICS_FORMAT_D32_SFLOAT;
+			break;
+		case VK_FORMAT_S8_UINT:
+			result = SF_GRAPHICS_FORMAT_S8_UINT;
+			break;
+		case VK_FORMAT_D16_UNORM_S8_UINT:
+			result = SF_GRAPHICS_FORMAT_D16_UNORM_S8_UINT;
+			break;
+		case VK_FORMAT_D24_UNORM_S8_UINT:
+			result = SF_GRAPHICS_FORMAT_D24_UNORM_S8_UINT;
+			break;
+		case VK_FORMAT_D32_SFLOAT_S8_UINT:
+			result = SF_GRAPHICS_FORMAT_D32_SFLOAT_S8_UINT;
+			break;
+		default:
+			result = SF_GRAPHICS_FORMAT_UNDEFINED;
+			break;
 	}
 
 	return result;
@@ -581,16 +778,26 @@ sf_graphics_vulkna_image_aspect_flags_from_format(enum sf_graphics_format format
 		case SF_GRAPHICS_FORMAT_R16G16B16A16_UNORM:
 		case SF_GRAPHICS_FORMAT_R16G16B16A16_SFLOAT:
 		case SF_GRAPHICS_FORMAT_R32G32B32A32_UINT:
-		case SF_GRAPHICS_FORMAT_R32G32B32A32_SFLOAT: result = VK_IMAGE_ASPECT_COLOR_BIT; break;
+		case SF_GRAPHICS_FORMAT_R32G32B32A32_SFLOAT:
+			result = VK_IMAGE_ASPECT_COLOR_BIT;
+			break;
 		// Depth/stencil
 		case SF_GRAPHICS_FORMAT_D16_UNORM:
 		case SF_GRAPHICS_FORMAT_X8_D24_UNORM_PACK32:
-		case SF_GRAPHICS_FORMAT_D32_SFLOAT:	     result = VK_IMAGE_ASPECT_DEPTH_BIT; break;
-		case SF_GRAPHICS_FORMAT_S8_UINT:	     result = VK_IMAGE_ASPECT_STENCIL_BIT; break;
+		case SF_GRAPHICS_FORMAT_D32_SFLOAT:
+			result = VK_IMAGE_ASPECT_DEPTH_BIT;
+			break;
+		case SF_GRAPHICS_FORMAT_S8_UINT:
+			result = VK_IMAGE_ASPECT_STENCIL_BIT;
+			break;
 		case SF_GRAPHICS_FORMAT_D16_UNORM_S8_UINT:
 		case SF_GRAPHICS_FORMAT_D24_UNORM_S8_UINT:
-		case SF_GRAPHICS_FORMAT_D32_SFLOAT_S8_UINT:  result = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT; break;
-		default:				     result = 0; break;
+		case SF_GRAPHICS_FORMAT_D32_SFLOAT_S8_UINT:
+			result = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+			break;
+		default:
+			result = 0;
+			break;
 	}
 
 	return result;
@@ -600,12 +807,24 @@ sf_private VkSampleCountFlags
 sf_graphics_vulkan_sample_count_from_sample_count(enum sf_graphics_sample_count samples) {
 	VkSampleCountFlagBits result = VK_SAMPLE_COUNT_1_BIT;
 	switch (samples) {
-		case SF_GRAPHICS_SAMPLE_COUNT_1:  result = VK_SAMPLE_COUNT_1_BIT; break;
-		case SF_GRAPHICS_SAMPLE_COUNT_2:  result = VK_SAMPLE_COUNT_2_BIT; break;
-		case SF_GRAPHICS_SAMPLE_COUNT_4:  result = VK_SAMPLE_COUNT_4_BIT; break;
-		case SF_GRAPHICS_SAMPLE_COUNT_8:  result = VK_SAMPLE_COUNT_8_BIT; break;
-		case SF_GRAPHICS_SAMPLE_COUNT_16: result = VK_SAMPLE_COUNT_16_BIT; break;
-		default:			  result = VK_SAMPLE_COUNT_1_BIT; break;
+		case SF_GRAPHICS_SAMPLE_COUNT_1:
+			result = VK_SAMPLE_COUNT_1_BIT;
+			break;
+		case SF_GRAPHICS_SAMPLE_COUNT_2:
+			result = VK_SAMPLE_COUNT_2_BIT;
+			break;
+		case SF_GRAPHICS_SAMPLE_COUNT_4:
+			result = VK_SAMPLE_COUNT_4_BIT;
+			break;
+		case SF_GRAPHICS_SAMPLE_COUNT_8:
+			result = VK_SAMPLE_COUNT_8_BIT;
+			break;
+		case SF_GRAPHICS_SAMPLE_COUNT_16:
+			result = VK_SAMPLE_COUNT_16_BIT;
+			break;
+		default:
+			result = VK_SAMPLE_COUNT_1_BIT;
+			break;
 	}
 	return result;
 }
@@ -614,12 +833,24 @@ sf_private enum sf_graphics_sample_count
 sf_graphics_sample_count_from_vulkan_sample_count(VkSampleCountFlags samples) {
 	enum sf_graphics_sample_count result = SF_GRAPHICS_SAMPLE_COUNT_1;
 	switch (samples) {
-		case VK_SAMPLE_COUNT_1_BIT:  result = SF_GRAPHICS_SAMPLE_COUNT_1; break;
-		case VK_SAMPLE_COUNT_2_BIT:  result = SF_GRAPHICS_SAMPLE_COUNT_2; break;
-		case VK_SAMPLE_COUNT_4_BIT:  result = SF_GRAPHICS_SAMPLE_COUNT_4; break;
-		case VK_SAMPLE_COUNT_8_BIT:  result = SF_GRAPHICS_SAMPLE_COUNT_8; break;
-		case VK_SAMPLE_COUNT_16_BIT: result = SF_GRAPHICS_SAMPLE_COUNT_16; break;
-		default:		     result = SF_GRAPHICS_SAMPLE_COUNT_1; break;
+		case VK_SAMPLE_COUNT_1_BIT:
+			result = SF_GRAPHICS_SAMPLE_COUNT_1;
+			break;
+		case VK_SAMPLE_COUNT_2_BIT:
+			result = SF_GRAPHICS_SAMPLE_COUNT_2;
+			break;
+		case VK_SAMPLE_COUNT_4_BIT:
+			result = SF_GRAPHICS_SAMPLE_COUNT_4;
+			break;
+		case VK_SAMPLE_COUNT_8_BIT:
+			result = SF_GRAPHICS_SAMPLE_COUNT_8;
+			break;
+		case VK_SAMPLE_COUNT_16_BIT:
+			result = SF_GRAPHICS_SAMPLE_COUNT_16;
+			break;
+		default:
+			result = SF_GRAPHICS_SAMPLE_COUNT_1;
+			break;
 	}
 	return result;
 }
@@ -691,7 +922,8 @@ sf_graphics_vulkan_create_image(struct sf_graphics_renderer *r, struct sf_graphi
 	info.pQueueFamilyIndices   = NULL;
 	info.initialLayout	   = VK_IMAGE_LAYOUT_UNDEFINED;
 
-	if (!SF_VULKAN_CHECK(vkCreateImage(r->vk_device, &info, r->vk_allocation_callbacks, &texture->vk_image))) texture->vk_image = VK_NULL_HANDLE;
+	if (!SF_VULKAN_CHECK(vkCreateImage(r->vk_device, &info, r->vk_allocation_callbacks, &texture->vk_image)))
+		texture->vk_image = VK_NULL_HANDLE;
 }
 
 sf_private void
@@ -741,7 +973,7 @@ sf_graphics_destroy_texture(struct sf_graphics_renderer *r, sf_handle handle) {
 
 sf_private sf_handle
 sf_graphics_vulkan_create_texture(
-    struct sf_graphics_renderer	   *r,
+    struct sf_graphics_renderer *   r,
     enum sf_graphics_texture_type   type,
     enum sf_graphics_format	    format,
     enum sf_graphics_sample_count   samples,
@@ -752,8 +984,7 @@ sf_graphics_vulkan_create_texture(
     u32				    mips,
     sf_bool			    mapped,
     struct sf_graphics_clear_value *clear_value,
-    VkImage			    vk_not_owned_image
-) {
+    VkImage			    vk_not_owned_image) {
 	struct sf_graphics_texture *texture = NULL;
 
 	if (!r) return SF_NULL_HANDLE;
@@ -771,7 +1002,8 @@ sf_graphics_vulkan_create_texture(
 	texture->mips	 = mips;
 	texture->mapped	 = mapped;
 	if (clear_value) texture->clear_value = *clear_value;
-	else texture->clear_value.type = SF_GRAPHICS_CLEAR_VALUE_TYPE_NONE;
+	else
+		texture->clear_value.type = SF_GRAPHICS_CLEAR_VALUE_TYPE_NONE;
 
 	if (!vk_not_owned_image) {
 		texture->vk_owns_image_and_memory = SF_TRUE;
@@ -799,7 +1031,7 @@ error:
 
 sf_public sf_handle
 sf_graphics_create_texture(
-    struct sf_graphics_renderer	   *r,
+    struct sf_graphics_renderer *   r,
     enum sf_graphics_texture_type   type,
     enum sf_graphics_format	    format,
     enum sf_graphics_sample_count   samples,
@@ -809,9 +1041,20 @@ sf_graphics_create_texture(
     u32				    depth,
     u32				    mips,
     sf_bool			    mapped,
-    struct sf_graphics_clear_value *clear_value
-) {
-	return sf_graphics_vulkan_create_texture(r, type, format, samples, usage, width, height, depth, mips, mapped, clear_value, VK_NULL_HANDLE);
+    struct sf_graphics_clear_value *clear_value) {
+	return sf_graphics_vulkan_create_texture(
+	    r,
+	    type,
+	    format,
+	    samples,
+	    usage,
+	    width,
+	    height,
+	    depth,
+	    mips,
+	    mapped,
+	    clear_value,
+	    VK_NULL_HANDLE);
 }
 
 sf_private void
@@ -825,10 +1068,10 @@ sf_graphics_vulkan_create_render_target_render_pass(struct sf_graphics_renderer 
 	u32			 resolve_attachment_count	    = 0;
 	sf_bool			 has_depth_stencil_attachment	    = SF_FALSE;
 	u32			 description_count		    = 0;
-	struct sf_arena		*arena				    = NULL;
+	struct sf_arena *	 arena				    = NULL;
 	VkAttachmentDescription *descriptions			    = NULL;
-	VkAttachmentReference	*color_references		    = NULL;
-	VkAttachmentReference	*resolve_references		    = NULL;
+	VkAttachmentReference *	 color_references		    = NULL;
+	VkAttachmentReference *	 resolve_references		    = NULL;
 
 	if (!r || !render_target || !r->vk_device) return;
 
@@ -844,12 +1087,13 @@ sf_graphics_vulkan_create_render_target_render_pass(struct sf_graphics_renderer 
 	color_references   = sf_arena_allocate(arena, render_target->color_attachment_count * sizeof(*color_references));
 	resolve_references = sf_arena_allocate(arena, render_target->resolve_attachment_count * sizeof(*resolve_references));
 
-	if (!descriptions || !(!color_attachment_count || color_references) || !(!resolve_attachment_count || resolve_references)) goto cleanup;
+	if (!descriptions || !(!color_attachment_count || color_references) || !(!resolve_attachment_count || resolve_references))
+		goto cleanup;
 
 	for (i = 0; i < render_target->color_attachment_count; ++i) {
 		u32			 desc_index = i * (!!resolve_attachment_count) * 2;
 		VkAttachmentDescription *desc	    = &descriptions[desc_index];
-		VkAttachmentReference	*reference  = &color_references[i];
+		VkAttachmentReference *	 reference  = &color_references[i];
 
 		struct sf_graphics_texture *attachment = sf_graphics_texture_from_handle(r, render_target->color_attachments[i]);
 
@@ -862,7 +1106,8 @@ sf_graphics_vulkan_create_render_target_render_pass(struct sf_graphics_renderer 
 		desc->stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE;
 		desc->initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
 		if (attachment->vk_owns_image_and_memory) desc->finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-		else desc->finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		else
+			desc->finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
 		reference->attachment = desc_index;
 		reference->layout     = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
@@ -871,7 +1116,7 @@ sf_graphics_vulkan_create_render_target_render_pass(struct sf_graphics_renderer 
 	for (i = 0; i < render_target->resolve_attachment_count; ++i) {
 		u32			 desc_index = i * 2 + 1;
 		VkAttachmentDescription *desc	    = &descriptions[desc_index];
-		VkAttachmentReference	*reference  = &resolve_references[i];
+		VkAttachmentReference *	 reference  = &resolve_references[i];
 
 		struct sf_graphics_texture *attachment = sf_graphics_texture_from_handle(r, render_target->resolve_attachments[i]);
 
@@ -892,7 +1137,7 @@ sf_graphics_vulkan_create_render_target_render_pass(struct sf_graphics_renderer 
 	if (has_depth_stencil_attachment) {
 		u32			 desc_index = description_count - 1;
 		VkAttachmentDescription *desc	    = &descriptions[desc_index];
-		VkAttachmentReference	*ref	    = &depth_stencil_attachment_reference;
+		VkAttachmentReference *	 ref	    = &depth_stencil_attachment_reference;
 
 		struct sf_graphics_texture *attachment = sf_graphics_texture_from_handle(r, render_target->depth_stencil_attachment);
 
@@ -919,7 +1164,8 @@ sf_graphics_vulkan_create_render_target_render_pass(struct sf_graphics_renderer 
 	subpass.pResolveAttachments  = resolve_references;
 	if (!sf_graphics_is_null_handle(render_target->depth_stencil_attachment))
 		subpass.pDepthStencilAttachment = &depth_stencil_attachment_reference;
-	else subpass.pDepthStencilAttachment = NULL;
+	else
+		subpass.pDepthStencilAttachment = NULL;
 	subpass.preserveAttachmentCount = 0;
 	subpass.pPreserveAttachments	= NULL;
 
@@ -1028,7 +1274,7 @@ sf_graphics_destroy_render_target(struct sf_graphics_renderer *r, sf_handle hand
 
 sf_private sf_handle
 sf_graphics_vulkan_create_render_target(
-    struct sf_graphics_renderer	   *r,
+    struct sf_graphics_renderer *   r,
     u32				    width,
     u32				    height,
     enum sf_graphics_sample_count   samples,
@@ -1037,8 +1283,7 @@ sf_graphics_vulkan_create_render_target(
     u32				    color_attachment_count,
     struct sf_graphics_clear_value *color_clear_values,
     struct sf_graphics_clear_value *depth_stencil_clear_value,
-    VkImage			    vk_swapchain_image
-) {
+    VkImage			    vk_swapchain_image) {
 	u32				  i	 = 0;
 	struct sf_graphics_render_target *result = NULL;
 
@@ -1052,8 +1297,8 @@ sf_graphics_vulkan_create_render_target(
 	result->height			 = height;
 	result->resolve_attachment_count = SF_GRAPHICS_SAMPLE_COUNT_1 != samples ? color_attachment_count : 0;
 	result->color_attachment_count	 = color_attachment_count;
-	result->total_attachment_count	 = color_attachment_count + result->resolve_attachment_count +
-					 !!(depth_stencil_format != SF_GRAPHICS_FORMAT_UNDEFINED);
+	result->total_attachment_count =
+	    color_attachment_count + result->resolve_attachment_count + !!(depth_stencil_format != SF_GRAPHICS_FORMAT_UNDEFINED);
 
 	for (i = 0; i < result->color_attachment_count; ++i) {
 		struct sf_graphics_clear_value *clear_value = color_clear_values ? &color_clear_values[i] : NULL;
@@ -1069,8 +1314,7 @@ sf_graphics_vulkan_create_render_target(
 		    1,
 		    1,
 		    SF_FALSE,
-		    clear_value
-		);
+		    clear_value);
 
 		if (sf_graphics_is_null_handle(result->color_attachments[i])) goto error;
 	}
@@ -1090,8 +1334,7 @@ sf_graphics_vulkan_create_render_target(
 		    1,
 		    SF_FALSE,
 		    clear_value,
-		    vk_swapchain_image
-		);
+		    vk_swapchain_image);
 		if (sf_graphics_is_null_handle(result->resolve_attachments[i])) goto error;
 	}
 
@@ -1107,8 +1350,7 @@ sf_graphics_vulkan_create_render_target(
 		    1,
 		    1,
 		    SF_FALSE,
-		    depth_stencil_clear_value
-		);
+		    depth_stencil_clear_value);
 		if (sf_graphics_is_null_handle(result->depth_stencil_attachment)) goto error;
 	}
 
@@ -1127,7 +1369,7 @@ error:
 
 sf_public sf_handle
 sf_graphics_create_render_target(
-    struct sf_graphics_renderer	   *r,
+    struct sf_graphics_renderer *   r,
     u32				    width,
     u32				    height,
     enum sf_graphics_sample_count   samples,
@@ -1135,8 +1377,7 @@ sf_graphics_create_render_target(
     enum sf_graphics_format	    depth_stencil_format,
     u32				    color_attachment_count,
     struct sf_graphics_clear_value *color_clear_values,
-    struct sf_graphics_clear_value *depth_stencil_clear_value
-) {
+    struct sf_graphics_clear_value *depth_stencil_clear_value) {
 	return sf_graphics_vulkan_create_render_target(
 	    r,
 	    width,
@@ -1147,8 +1388,7 @@ sf_graphics_create_render_target(
 	    color_attachment_count,
 	    color_clear_values,
 	    depth_stencil_clear_value,
-	    VK_NULL_HANDLE
-	);
+	    VK_NULL_HANDLE);
 }
 
 sf_private void
@@ -1163,8 +1403,7 @@ sf_graphics_vulkan_destroy_swapchain_resources(struct sf_graphics_renderer *r) {
 	}
 	r->swapchain_render_target_count = 0;
 
-	for (i = 0; i < SF_SIZE(r->vk_swapchain_images); ++i)
-		r->vk_swapchain_images[i] = VK_NULL_HANDLE;
+	for (i = 0; i < SF_SIZE(r->vk_swapchain_images); ++i) r->vk_swapchain_images[i] = VK_NULL_HANDLE;
 
 	r->vk_swapchain_image_count = 0;
 
@@ -1253,8 +1492,7 @@ sf_graphics_vulkan_create_swapchain_render_targets(struct sf_graphics_renderer *
 		    1,
 		    &r->swapchain_color_clear_value,
 		    &r->swapchain_depth_stencil_clear_value,
-		    r->vk_swapchain_images[i]
-		);
+		    r->vk_swapchain_images[i]);
 
 		if (sf_graphics_is_null_handle(r->swapchain_render_targets[i])) return;
 	}
@@ -1316,10 +1554,10 @@ sf_graphics_create_command_buffer(struct sf_graphics_renderer *r, sf_bool transi
 	command_pool_info.pNext = NULL;
 	command_pool_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 	if (transient) command_pool_info.flags |= VK_COMMAND_POOL_CREATE_TRANSIENT_BIT;
-	// FIXME(samuel): for now manually set the graphics queue as the family
-	// index. Later we should pass the requried queue handle
+	// FIXME(samuel): for now manually set the graphics queue as the family index. Later we should pass the required queue handle
 	command_pool_info.queueFamilyIndex = r->vk_graphics_queue_family_index;
-	if (!SF_VULKAN_CHECK(vkCreateCommandPool(r->vk_device, &command_pool_info, r->vk_allocation_callbacks, &command_buffer->vk_command_pool)))
+	if (!SF_VULKAN_CHECK(
+		vkCreateCommandPool(r->vk_device, &command_pool_info, r->vk_allocation_callbacks, &command_buffer->vk_command_pool)))
 		goto error;
 
 	command_buffer_info.sType	       = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -1390,67 +1628,323 @@ sf_private u64
 sf_graphics_stride_from_format(enum sf_graphics_format format) {
 	switch (format) {
 		// 1 channel
-		case SF_GRAPHICS_FORMAT_R8_UNORM:	     return 1;
-		case SF_GRAPHICS_FORMAT_R16_UNORM:	     return 2;
-		case SF_GRAPHICS_FORMAT_R16_UINT:	     return 2;
-		case SF_GRAPHICS_FORMAT_R16_SFLOAT:	     return 2;
-		case SF_GRAPHICS_FORMAT_R32_UINT:	     return 4;
-		case SF_GRAPHICS_FORMAT_R32_SFLOAT:	     return 4;
+		case SF_GRAPHICS_FORMAT_R8_UNORM:
+			return 1;
+		case SF_GRAPHICS_FORMAT_R16_UNORM:
+			return 2;
+		case SF_GRAPHICS_FORMAT_R16_UINT:
+			return 2;
+		case SF_GRAPHICS_FORMAT_R16_SFLOAT:
+			return 2;
+		case SF_GRAPHICS_FORMAT_R32_UINT:
+			return 4;
+		case SF_GRAPHICS_FORMAT_R32_SFLOAT:
+			return 4;
 		// 2 CHANNEL
-		case SF_GRAPHICS_FORMAT_R8G8_UNORM:	     return 2;
-		case SF_GRAPHICS_FORMAT_R16G16_UNORM:	     return 4;
-		case SF_GRAPHICS_FORMAT_R16G16_SFLOAT:	     return 4;
-		case SF_GRAPHICS_FORMAT_R32G32_UINT:	     return 8;
-		case SF_GRAPHICS_FORMAT_R32G32_SFLOAT:	     return 8;
+		case SF_GRAPHICS_FORMAT_R8G8_UNORM:
+			return 2;
+		case SF_GRAPHICS_FORMAT_R16G16_UNORM:
+			return 4;
+		case SF_GRAPHICS_FORMAT_R16G16_SFLOAT:
+			return 4;
+		case SF_GRAPHICS_FORMAT_R32G32_UINT:
+			return 8;
+		case SF_GRAPHICS_FORMAT_R32G32_SFLOAT:
+			return 8;
 		// 3 CHANNEL
-		case SF_GRAPHICS_FORMAT_R8G8B8_UNORM:	     return 3;
-		case SF_GRAPHICS_FORMAT_R16G16B16_UNORM:     return 6;
-		case SF_GRAPHICS_FORMAT_R16G16B16_SFLOAT:    return 6;
-		case SF_GRAPHICS_FORMAT_R32G32B32_UINT:	     return 12;
-		case SF_GRAPHICS_FORMAT_R32G32B32_SFLOAT:    return 12;
+		case SF_GRAPHICS_FORMAT_R8G8B8_UNORM:
+			return 3;
+		case SF_GRAPHICS_FORMAT_R16G16B16_UNORM:
+			return 6;
+		case SF_GRAPHICS_FORMAT_R16G16B16_SFLOAT:
+			return 6;
+		case SF_GRAPHICS_FORMAT_R32G32B32_UINT:
+			return 12;
+		case SF_GRAPHICS_FORMAT_R32G32B32_SFLOAT:
+			return 12;
 		// 4 CHANNEL
-		case SF_GRAPHICS_FORMAT_B8G8R8A8_UNORM:	     return 4;
-		case SF_GRAPHICS_FORMAT_R8G8B8A8_UNORM:	     return 4;
-		case SF_GRAPHICS_FORMAT_R16G16B16A16_UNORM:  return 8;
-		case SF_GRAPHICS_FORMAT_R16G16B16A16_SFLOAT: return 8;
-		case SF_GRAPHICS_FORMAT_R32G32B32A32_UINT:   return 16;
-		case SF_GRAPHICS_FORMAT_R32G32B32A32_SFLOAT: return 16;
+		case SF_GRAPHICS_FORMAT_B8G8R8A8_UNORM:
+			return 4;
+		case SF_GRAPHICS_FORMAT_R8G8B8A8_UNORM:
+			return 4;
+		case SF_GRAPHICS_FORMAT_R16G16B16A16_UNORM:
+			return 8;
+		case SF_GRAPHICS_FORMAT_R16G16B16A16_SFLOAT:
+			return 8;
+		case SF_GRAPHICS_FORMAT_R32G32B32A32_UINT:
+			return 16;
+		case SF_GRAPHICS_FORMAT_R32G32B32A32_SFLOAT:
+			return 16;
 		// DEPTH/STENCIL
-		case SF_GRAPHICS_FORMAT_D16_UNORM:	     return 0;
-		case SF_GRAPHICS_FORMAT_X8_D24_UNORM_PACK32: return 0;
-		case SF_GRAPHICS_FORMAT_D32_SFLOAT:	     return 0;
-		case SF_GRAPHICS_FORMAT_S8_UINT:	     return 0;
-		case SF_GRAPHICS_FORMAT_D16_UNORM_S8_UINT:   return 0;
-		case SF_GRAPHICS_FORMAT_D24_UNORM_S8_UINT:   return 0;
-		case SF_GRAPHICS_FORMAT_D32_SFLOAT_S8_UINT:  return 0;
-		default:				     return 0;
+		case SF_GRAPHICS_FORMAT_D16_UNORM:
+			return 0;
+		case SF_GRAPHICS_FORMAT_X8_D24_UNORM_PACK32:
+			return 0;
+		case SF_GRAPHICS_FORMAT_D32_SFLOAT:
+			return 0;
+		case SF_GRAPHICS_FORMAT_S8_UINT:
+			return 0;
+		case SF_GRAPHICS_FORMAT_D16_UNORM_S8_UINT:
+			return 0;
+		case SF_GRAPHICS_FORMAT_D24_UNORM_S8_UINT:
+			return 0;
+		case SF_GRAPHICS_FORMAT_D32_SFLOAT_S8_UINT:
+			return 0;
+		default:
+			return 0;
 	}
+}
+
+struct sf_graphics_vulkan_vertex_attribute_info {
+	VkVertexInputBindingDescription	   binding;
+	u32				   attribute_count;
+	VkVertexInputAttributeDescription *attributes;
+};
+
+sf_private struct sf_graphics_vulkan_vertex_attribute_info *
+sf_graphics_create_vulkan_vertex_attribute_info(struct sf_arena *arena, struct sf_graphics_vertex_layout *layout) {
+	u32						 i	= 0;
+	struct sf_graphics_vulkan_vertex_attribute_info *result = NULL;
+
+	if (!arena || !layout || !layout->attribute_count) return NULL;
+
+	result = sf_arena_allocate(arena, sizeof(*result));
+	if (!result) return NULL;
+
+	result->attributes = sf_arena_allocate(arena, layout->attribute_count * sizeof(*result->attributes));
+	if (!result->attributes) return NULL;
+
+	result->binding.binding	  = 0;
+	result->binding.stride	  = layout->stride;
+	result->binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+	for (i = 0; i < layout->attribute_count; ++i) {
+		struct sf_graphics_vertex_attribute *attribute	  = &layout->attributes[i];
+		VkVertexInputAttributeDescription *  vk_attribute = &result->attributes[i];
+
+		vk_attribute->location = i;
+		vk_attribute->binding  = 0; // FIXME(samuel): always 0. Add option for mutliple bindings later
+		vk_attribute->format   = sf_graphics_vulkan_format_from_format(attribute->format);
+		vk_attribute->offset   = attribute->offset;
+	}
+
+	result->attribute_count = layout->attribute_count;
+
+	return result;
 }
 
 sf_public sf_handle
 sf_graphics_create_pipeline(
-    struct sf_graphics_renderer		     *r,
-    struct sf_graphics_vertex_layout	     *vertex_layout,
+    struct sf_graphics_renderer *	      r,
+    sf_bool				      enable_depth,
+    struct sf_graphics_vertex_layout *	      vertex_layout,
     struct sf_graphics_descriptor_set_layout *descriptor_set_layout,
+    struct sf_graphics_render_target *target,
     u32					      vertex_code_size,
-    void const				     *vertex_code,
+    void const *			      vertex_code,
     u32					      fragment_code_size,
-    void const				     *fragment_code
-) {
-	struct sf_graphics_pipeline *pipeline = NULL;
+    void const *			      fragment_code) {
+	struct sf_graphics_pipeline *			 pipeline		= NULL;
+	VkPipelineLayoutCreateInfo			 pipeline_layout_info	= {0};
+	VkPipelineShaderStageCreateInfo			 stages[2]		= {0};
+	struct sf_graphics_vulkan_vertex_attribute_info *vertex_attributes	= NULL;
+	VkPipelineVertexInputStateCreateInfo		 vertex_info		= {0};
+	VkPipelineInputAssemblyStateCreateInfo		 input_assembly		= {0};
+	VkViewport					 viewport		= {0};
+	VkRect2D					 scissor		= {0};
+	VkPipelineViewportStateCreateInfo		 viewport_info		= {0};
+	VkPipelineRasterizationStateCreateInfo		 rasterization_info	= {0};
+	VkPipelineMultisampleStateCreateInfo		 multisample_info	= {0};
+	VkPipelineColorBlendAttachmentState		 color_blend_attachment = {0};
+	VkPipelineColorBlendStateCreateInfo		 color_blend_info	= {0};
+	VkPipelineDepthStencilStateCreateInfo		 depth_stencil_info	= {0};
+	VkDynamicState					 dynamic_states[]	= {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+	VkPipelineDynamicStateCreateInfo		 dynamic_info		= {0};
+	VkGraphicsPipelineCreateInfo info = {0};
 
 	if (!r) return SF_NULL_HANDLE;
 
 	pipeline = sf_graphics_get_pipeline_from_resource_pool(r);
 	if (!pipeline) return SF_NULL_HANDLE;
 
-	pipeline->vk_vertex_shader   = sf_graphics_vulkan_create_shader(r, vertex_code_size, vertex_code);
+	pipeline_layout_info.sType		    = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	pipeline_layout_info.pNext		    = NULL;
+	pipeline_layout_info.flags		    = 0;
+	pipeline_layout_info.setLayoutCount	    = 1;
+	pipeline_layout_info.pSetLayouts	    = &descriptor_set_layout->vk_layout;
+	pipeline_layout_info.pushConstantRangeCount = 0;
+	pipeline_layout_info.pPushConstantRanges    = NULL;
+
+	if (!SF_VULKAN_CHECK(
+		vkCreatePipelineLayout(r->vk_device, &pipeline_layout_info, r->vk_allocation_callbacks, &pipeline->vk_pipeline_layout))) {
+		pipeline->vk_pipeline_layout = VK_NULL_HANDLE;
+		goto error;
+	}
+
+	pipeline->vk_vertex_shader = sf_graphics_vulkan_create_shader(r, vertex_code_size, vertex_code);
+	if (!pipeline->vk_vertex_shader) goto error;
+
 	pipeline->vk_fragment_shader = sf_graphics_vulkan_create_shader(r, fragment_code_size, fragment_code);
+	if (!pipeline->vk_fragment_shader) goto error;
+
+	stages[0].sType	 = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	stages[0].stage	 = VK_SHADER_STAGE_VERTEX_BIT;
+	stages[0].module = pipeline->vk_vertex_shader;
+	stages[0].pName	 = "main";
+
+	stages[1].sType	 = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	stages[1].stage	 = VK_SHADER_STAGE_FRAGMENT_BIT;
+	stages[1].module = pipeline->vk_fragment_shader;
+	stages[1].pName	 = "main";
+
+	vertex_attributes = sf_graphics_create_vulkan_vertex_attribute_info(&r->arena, vertex_layout);
+	if (!vertex_attributes) goto error;
+
+	vertex_info.sType			    = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+	vertex_info.pNext			    = NULL;
+	vertex_info.flags			    = 0;
+	vertex_info.vertexBindingDescriptionCount   = 1;
+	vertex_info.pVertexBindingDescriptions	    = &vertex_attributes->binding;
+	vertex_info.vertexAttributeDescriptionCount = vertex_attributes->attribute_count;
+	vertex_info.pVertexAttributeDescriptions    = vertex_attributes->attributes;
+
+	input_assembly.sType		      = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+	input_assembly.pNext		      = NULL;
+	input_assembly.flags		      = 0;
+	input_assembly.topology		      = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+	input_assembly.primitiveRestartEnable = VK_FALSE;
+
+	viewport.x	  = 0.0F;
+	viewport.y	  = 0.0F;
+	viewport.width	  = r->swapchain_width;
+	viewport.height	  = r->swapchain_height;
+	viewport.minDepth = 0.0F;
+	viewport.maxDepth = 1.0F;
+
+	scissor.offset.x      = 0;
+	scissor.offset.y      = 0;
+	scissor.extent.width  = r->swapchain_width;
+	scissor.extent.height = r->swapchain_height;
+
+	viewport_info.sType	    = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+	viewport_info.pNext	    = NULL;
+	viewport_info.flags	    = 0;
+	viewport_info.viewportCount = 1;
+	viewport_info.pViewports    = &viewport;
+	viewport_info.scissorCount  = 1;
+	viewport_info.pScissors	    = &scissor;
+
+	rasterization_info.sType		   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_LINE_STATE_CREATE_INFO;
+	rasterization_info.pNext		   = NULL;
+	rasterization_info.flags		   = 0;
+	rasterization_info.depthClampEnable	   = VK_FALSE;
+	rasterization_info.rasterizerDiscardEnable = VK_FALSE;
+	rasterization_info.polygonMode		   = VK_POLYGON_MODE_FILL;
+	rasterization_info.cullMode		   = VK_CULL_MODE_BACK_BIT;
+	rasterization_info.frontFace		   = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+	rasterization_info.depthBiasEnable	   = VK_FALSE;
+	rasterization_info.depthBiasConstantFactor = 0.0F;
+	rasterization_info.depthBiasClamp	   = 0.0F;
+	rasterization_info.depthBiasSlopeFactor	   = 0.0F;
+	rasterization_info.lineWidth		   = 1.0F;
+
+	multisample_info.sType		       = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+	multisample_info.pNext		       = NULL;
+	multisample_info.flags		       = 0;
+	multisample_info.rasterizationSamples  = r->vk_samples;
+	multisample_info.sampleShadingEnable   = VK_FALSE;
+	multisample_info.minSampleShading      = 0.0F;
+	multisample_info.pSampleMask	       = NULL;
+	multisample_info.alphaToCoverageEnable = VK_FALSE;
+	multisample_info.alphaToOneEnable      = VK_FALSE;
+
+	color_blend_attachment.blendEnable	   = VK_FALSE;
+	color_blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+	color_blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+	color_blend_attachment.colorBlendOp	   = VK_BLEND_OP_ADD;
+	color_blend_attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+	color_blend_attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+	color_blend_attachment.alphaBlendOp	   = VK_BLEND_OP_ADD;
+	color_blend_attachment.colorWriteMask	   = 0;
+	color_blend_attachment.colorWriteMask |= VK_COLOR_COMPONENT_R_BIT;
+	color_blend_attachment.colorWriteMask |= VK_COLOR_COMPONENT_G_BIT;
+	color_blend_attachment.colorWriteMask |= VK_COLOR_COMPONENT_B_BIT;
+	color_blend_attachment.colorWriteMask |= VK_COLOR_COMPONENT_A_BIT;
+
+	color_blend_info.sType		   = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+	color_blend_info.pNext		   = NULL;
+	color_blend_info.flags		   = 0;
+	color_blend_info.logicOpEnable	   = VK_FALSE;
+	color_blend_info.logicOp	   = VK_LOGIC_OP_NO_OP;
+	color_blend_info.attachmentCount   = 1;
+	color_blend_info.pAttachments	   = &color_blend_attachment;
+	color_blend_info.blendConstants[0] = 0.0F;
+	color_blend_info.blendConstants[1] = 0.0F;
+	color_blend_info.blendConstants[2] = 0.0F;
+	color_blend_info.blendConstants[3] = 0.0F;
+
+	depth_stencil_info.sType		 = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+	depth_stencil_info.pNext		 = NULL;
+	depth_stencil_info.flags		 = 0;
+	depth_stencil_info.depthTestEnable	 = enable_depth ? VK_TRUE : VK_FALSE;
+	depth_stencil_info.depthWriteEnable	 = enable_depth ? VK_TRUE : VK_FALSE;
+	depth_stencil_info.depthCompareOp	 = VK_COMPARE_OP_LESS;
+	depth_stencil_info.depthBoundsTestEnable = VK_FALSE;
+	depth_stencil_info.stencilTestEnable	 = VK_FALSE;
+	depth_stencil_info.front.failOp	     = VK_STENCIL_OP_KEEP;
+	depth_stencil_info.front.passOp	     = VK_STENCIL_OP_KEEP;
+	depth_stencil_info.front.depthFailOp = VK_STENCIL_OP_KEEP;
+	depth_stencil_info.front.compareOp   = VK_COMPARE_OP_NEVER;
+	depth_stencil_info.front.compareMask = 0;
+	depth_stencil_info.front.writeMask   = 0;
+	depth_stencil_info.front.reference   = 0;
+	depth_stencil_info.back.failOp	     = VK_STENCIL_OP_KEEP;
+	depth_stencil_info.back.passOp	     = VK_STENCIL_OP_KEEP;
+	depth_stencil_info.back.depthFailOp  = VK_STENCIL_OP_KEEP;
+	depth_stencil_info.back.compareOp    = VK_COMPARE_OP_NEVER;
+	depth_stencil_info.back.compareMask  = 0;
+	depth_stencil_info.back.writeMask    = 0;
+	depth_stencil_info.back.reference    = 0;
+	depth_stencil_info.minDepthBounds    = 0.0F;
+	depth_stencil_info.maxDepthBounds    = 0.0F;
+
+	dynamic_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+	dynamic_info.pNext = NULL;
+	dynamic_info.flags = 0;
+	dynamic_info.dynamicStateCount = SF_SIZE(dynamic_states);
+	dynamic_info.pDynamicStates = dynamic_states;
+
+	info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+	info.pNext = NULL;
+	info.flags = 0;
+	info.stageCount = SF_SIZE(stages);
+	info.pStages = stages;
+	info.pVertexInputState = &vertex_info;
+	info.pInputAssemblyState;
+	info.pTessellationState = NULL;
+	info.pViewportState = &viewport_info;
+	info.pRasterizationState = &rasterization_info;
+	info.pMultisampleState = &multisample_info;
+	info.pDepthStencilState = &depth_stencil_info;
+	info.pColorBlendState = &color_blend_info;
+	info.pDynamicState = &dynamic_info;
+	info.layout = pipeline->vk_pipeline_layout;
+	info.renderPass = target->vk_render_pass;
+	info.subpass = 0;
+	info.basePipelineHandle = VK_NULL_HANDLE;
+	info.basePipelineIndex = -1;
+
+	if (!SF_VULKAN_CHECK(vkCreateGraphicsPipelines(r->vk_device, VK_NULL_HANDLE, 1, &info, r->vk_allocation_callbacks, &pipeline->vk_pipeline))) {
+		pipeline->vk_pipeline = VK_NULL_HANDLE;
+		goto error;
+	}
 
 	return sf_graphics_handle_from_pipeline(r, pipeline);
-}
 
-#define SF_VULKAN_PROC(name, i) (PFN_##name) vkGetInstanceProcAddr(i, #name)
+error:
+	sf_graphics_destroy_pipeline(r, sf_graphics_handle_from_pipeline(r, pipeline));
+	return SF_NULL_HANDLE;
+}
 
 struct sf_graphics_device_list {
 	u32		  size;
@@ -1501,9 +1995,11 @@ sf_graphics_vulkan_create_instance(struct sf_graphics_renderer *r, struct sf_gra
 	if (!SF_VULKAN_CHECK(vkCreateInstance(&info, r->vk_allocation_callbacks, &r->vk_instance))) r->vk_instance = VK_NULL_HANDLE;
 }
 
+#define SF_VULKAN_PROC(name, i) (PFN_##name) vkGetInstanceProcAddr(i, #name)
+
 sf_private void
 sf_graphics_vulkan_proc_additional_functions(struct sf_graphics_renderer *r) {
-	if (!r) return;
+	if (!r || !r->vk_instance) return;
 
 	r->vk_create_debug_utils_messenger_ext	= SF_VULKAN_PROC(vkCreateDebugUtilsMessengerEXT, r->vk_instance);
 	r->vk_destroy_debug_utils_messenger_ext = SF_VULKAN_PROC(vkDestroyDebugUtilsMessengerEXT, r->vk_instance);
@@ -1613,7 +2109,8 @@ sf_graphics_vulkan_pick_present_mode(struct sf_graphics_renderer *r, struct sf_g
 	}
 
 	if (r->vk_present_mode == VK_PRESENT_MODE_FIFO_KHR) r->enable_vsync = SF_TRUE;
-	else r->enable_vsync = SF_FALSE;
+	else
+		r->enable_vsync = SF_FALSE;
 }
 
 sf_private void
@@ -1663,7 +2160,8 @@ sf_graphics_vulkan_pick_sample_count(struct sf_graphics_renderer *r) {
 	r->vk_samples = VK_SAMPLE_COUNT_1_BIT;
 
 	if (0) (void)0;
-	else if (sample_counts & VK_SAMPLE_COUNT_2_BIT) r->vk_samples = VK_SAMPLE_COUNT_2_BIT;
+	else if (sample_counts & VK_SAMPLE_COUNT_2_BIT)
+		r->vk_samples = VK_SAMPLE_COUNT_2_BIT;
 
 	r->swapchain_sample_count = sf_graphics_sample_count_from_vulkan_sample_count(r->vk_samples);
 }
@@ -1695,7 +2193,8 @@ sf_graphics_vulkan_create_device(struct sf_graphics_renderer *r, struct sf_graph
 	info.pNext = NULL;
 	info.flags = 0;
 	if (r->vk_graphics_queue_family_index == r->vk_present_queue_family_index) info.queueCreateInfoCount = 1;
-	else info.queueCreateInfoCount = SF_SIZE(queue_info);
+	else
+		info.queueCreateInfoCount = SF_SIZE(queue_info);
 	info.pQueueCreateInfos	     = queue_info;
 	info.enabledLayerCount	     = 0;
 	info.ppEnabledLayerNames     = NULL;
@@ -1703,7 +2202,8 @@ sf_graphics_vulkan_create_device(struct sf_graphics_renderer *r, struct sf_graph
 	info.ppEnabledExtensionNames = description->vk_device_extensions;
 	info.pEnabledFeatures	     = &features;
 
-	if (!SF_VULKAN_CHECK(vkCreateDevice(r->vk_physical_device, &info, r->vk_allocation_callbacks, &r->vk_device))) r->vk_device = VK_NULL_HANDLE;
+	if (!SF_VULKAN_CHECK(vkCreateDevice(r->vk_physical_device, &info, r->vk_allocation_callbacks, &r->vk_device)))
+		r->vk_device = VK_NULL_HANDLE;
 }
 
 sf_private void
@@ -1741,7 +2241,8 @@ sf_graphics_vulkan_create_image_acquired_semaphores(struct sf_graphics_renderer 
 		info.pNext = NULL;
 		info.flags = 0;
 
-		if (!SF_VULKAN_CHECK(vkCreateSemaphore(r->vk_device, &info, r->vk_allocation_callbacks, &r->vk_image_acquired_semaphores[i]))) {
+		if (!SF_VULKAN_CHECK(
+			vkCreateSemaphore(r->vk_device, &info, r->vk_allocation_callbacks, &r->vk_image_acquired_semaphores[i]))) {
 			r->vk_image_acquired_semaphores[i] = VK_NULL_HANDLE;
 			return;
 		}
@@ -1763,7 +2264,8 @@ sf_graphics_vulkan_create_draw_complete_semaphores(struct sf_graphics_renderer *
 		info.pNext = NULL;
 		info.flags = 0;
 
-		if (!SF_VULKAN_CHECK(vkCreateSemaphore(r->vk_device, &info, r->vk_allocation_callbacks, &r->vk_draw_complete_semaphores[i]))) {
+		if (!SF_VULKAN_CHECK(
+			vkCreateSemaphore(r->vk_device, &info, r->vk_allocation_callbacks, &r->vk_draw_complete_semaphores[i]))) {
 			r->vk_draw_complete_semaphores[i] = VK_NULL_HANDLE;
 			return;
 		}
@@ -1812,6 +2314,9 @@ sf_graphics_create_renderer(struct sf_arena *arena, struct sf_graphics_renderer_
 
 	sf_graphics_vulkan_proc_additional_functions(r);
 	if (!r->vk_create_debug_utils_messenger_ext || !r->vk_destroy_debug_utils_messenger_ext) goto error;
+
+	sf_graphics_vulkan_create_validation_messenger(r);
+	if (!r->vk_validation_messenger) goto error;
 
 	sf_graphics_vulkan_create_surface(r);
 	if (!r->vk_surface) goto error;
@@ -1936,7 +2441,7 @@ sf_graphics_begin_frame(struct sf_graphics_renderer *r) {
 	struct sf_graphics_command_buffer *current_command_buffer	    = NULL;
 	VkCommandBufferBeginInfo	   command_buffer_begin_info	    = {0};
 	VkClearValue			   clear_values[2]		    = {0};
-	struct sf_graphics_render_target  *current_render_target	    = NULL;
+	struct sf_graphics_render_target * current_render_target	    = NULL;
 	VkRenderPassBeginInfo		   render_pass_begin_info	    = {0};
 	VkViewport			   viewport			    = {0};
 	VkRect2D			   scissor			    = {0};
@@ -1956,8 +2461,7 @@ sf_graphics_begin_frame(struct sf_graphics_renderer *r) {
 	    (u64)-1,
 	    current_image_acquired_semaphore,
 	    VK_NULL_HANDLE,
-	    &r->current_swapchain_image_index
-	);
+	    &r->current_swapchain_image_index);
 	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_ERROR_SURFACE_LOST_KHR) {
 		SF_VULKAN_CHECK(result);
 		vkDeviceWaitIdle(r->vk_device);
@@ -2118,6 +2622,9 @@ sf_graphics_destroy_glfw_platform(struct sf_graphics_glfw_platform *platform) {
 		platform->window = NULL;
 	}
 
+	platform->window_width	= 0;
+	platform->window_height = 0;
+
 	glfwTerminate();
 }
 
@@ -2136,9 +2643,9 @@ sf_graphics_glfw_platform_should_close(struct sf_graphics_glfw_platform *platfor
 }
 
 sf_private void
-sf_graphics_glfw_platform_create_vulkan_surface(void *data, void *renderer) {
+sf_graphics_glfw_platform_create_vulkan_surface(void *data, struct sf_graphics_renderer *renderer) {
 	struct sf_graphics_glfw_platform *platform = (struct sf_graphics_glfw_platform *)data;
-	struct sf_graphics_renderer	 *r	   = (struct sf_graphics_renderer *)renderer;
+	struct sf_graphics_renderer *	  r	   = renderer;
 
 	if (!platform || !r || !r->vk_instance) return;
 
@@ -2147,9 +2654,9 @@ sf_graphics_glfw_platform_create_vulkan_surface(void *data, void *renderer) {
 }
 
 sf_private void
-sf_graphics_glfw_platform_request_swapchain_dimensions(void *data, void *renderer) {
+sf_graphics_glfw_platform_request_swapchain_dimensions(void *data, struct sf_graphics_renderer *renderer) {
 	struct sf_graphics_glfw_platform *platform = (struct sf_graphics_glfw_platform *)data;
-	struct sf_graphics_renderer	 *r	   = (struct sf_graphics_renderer *)renderer;
+	struct sf_graphics_renderer *	  r	   = renderer;
 
 	if (!platform || !r) return;
 
@@ -2159,17 +2666,22 @@ sf_graphics_glfw_platform_request_swapchain_dimensions(void *data, void *rendere
 
 sf_public void
 sf_graphics_glfw_platform_fill_renderer_description(
-    struct sf_arena			    *arena,
-    struct sf_graphics_glfw_platform	    *platform,
-    struct sf_graphics_renderer_description *description
-) {
+    struct sf_arena *			     arena,
+    struct sf_graphics_glfw_platform *	     platform,
+    struct sf_graphics_renderer_description *description) {
 	u32	     base_instance_extension_count = 0;
 	char const **base_instance_extensions	   = NULL;
 
 	u32 required_instance_extension_count = 0;
 
 	sf_local_persist char const *validation_layers[] = {"VK_LAYER_KHRONOS_validation"};
-	sf_local_persist char const *device_extensions[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+	sf_local_persist char const *device_extensions[] = {
+	    VK_KHR_SWAPCHAIN_EXTENSION_NAME
+#ifdef __APPLE__
+	    ,
+	    "VK_KHR_portability_subset"
+#endif
+	};
 
 	if (!platform || !description) return;
 
@@ -2186,22 +2698,21 @@ sf_graphics_glfw_platform_fill_renderer_description(
 	base_instance_extensions = glfwGetRequiredInstanceExtensions(&base_instance_extension_count);
 
 #ifdef __APPLE__
-	required_instance_extension_count   = base_instance_extension_count + 2;
+	required_instance_extension_count = base_instance_extension_count + 3;
 #else
-	required_instance_extension_count   = base_instance_extension_count + 1;
+	required_instance_extension_count = base_instance_extension_count + 1;
 #endif
 	description->vk_instance_extensions = sf_arena_allocate(arena, (required_instance_extension_count) * sizeof(char const *));
 	if (description->vk_instance_extensions) {
 		u32 i					 = 0;
 		description->vk_instance_extension_count = required_instance_extension_count;
 
-		for (i = 0; i < base_instance_extension_count; ++i)
-			description->vk_instance_extensions[i] = base_instance_extensions[i];
-
+		for (i = 0; i < base_instance_extension_count; ++i) description->vk_instance_extensions[i] = base_instance_extensions[i];
 
 		description->vk_instance_extensions[base_instance_extension_count + 0] = VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
 #ifdef __APPLE__
 		description->vk_instance_extensions[base_instance_extension_count + 1] = "VK_KHR_portability_enumeration";
+		description->vk_instance_extensions[base_instance_extension_count + 2] = "VK_KHR_get_physical_device_properties2";
 #endif
 	}
 
