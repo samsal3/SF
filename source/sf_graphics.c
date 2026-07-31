@@ -2351,6 +2351,8 @@ sf_private void
 sf_graphics_vulkan_pick_depth_stencil_format(struct sf_graphics_renderer *r) {
 	struct sf_graphics_vulkan_format_features_test test = {0};
 
+	r->swapchain_depth_stencil_format = VK_FORMAT_UNDEFINED;
+
 	if (!r || !r->vk_physical_device)
 		return;
 
@@ -2377,8 +2379,6 @@ sf_graphics_vulkan_pick_depth_stencil_format(struct sf_graphics_renderer *r) {
 
 	// No format was found, invalidate the device
 	r->vk_physical_device		  = VK_NULL_HANDLE;
-	r->swapchain_depth_stencil_format = VK_FORMAT_UNDEFINED;
-
 	return;
 
 set_swapchain_format:
@@ -2594,7 +2594,7 @@ sf_graphics_create_renderer(struct sf_arena *arena, struct sf_graphics_renderer_
 		goto error;
 
 	sf_graphics_vulkan_create_draw_complete_semaphores(r);
-	if (!r->vk_image_acquired_semaphore_count)
+	if (!r->vk_draw_complete_semaphore_count)
 		goto error;
 
 	sf_graphics_vulkan_create_in_flight_fences(r);
