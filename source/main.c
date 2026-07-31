@@ -15,6 +15,7 @@ main(void) {
 	arena.data	= malloc(1024 * 1024);
 	if (!arena.data) return 0;
 
+
 	title.data = "sf_graphics test";
 	title.size = sizeof("sf_graphics test");
 	platform   = sf_graphics_create_glfw_platform(&arena, 800, 600, &title);

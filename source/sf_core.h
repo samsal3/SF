@@ -3,34 +3,40 @@
 
 #include <stdint.h>
 
-#define SF_OFFSET_OF(type, name) ((intptr_t) & (((type *)NULL)->name))
+#define SF_OFFSET_OF(type, name) ((intptr_t)&(((type *)NULL)->name))
 #define SF_SIZE(a) (sizeof(a) / sizeof(0 [a]))
 #define SF_MIN(a, b) ((a) < (b) ? (a) : (b))
 #define SF_MAX(a, b) ((a) > (b) ? (a) : (b))
 #define SF_CLAMP(v, l, h) SF_MAX(SF_MIN(v, h), l);
 #define SF_FALSE 0
 #define SF_TRUE 1
+#define SF_KB(n) ((n) * 1024)
+#define SF_MB(n) ((n) * 1024 * 1024)
+#define SF_GB(n) ((n) * 1024 * 1024 * 1024)
 
 #ifndef NULL
 #define NULL ((void *)0)
 #endif
 
-#define SF_ARRAY_INIT(a, value)                                      \
-	do {                                                         \
-		size_t i_;                                           \
-		for (i_ = 0; i_ < SF_SIZE(a); ++i_) (a)[i_] = value; \
+#define SF_ARRAY_INIT(a, value)                     \
+	do {                                        \
+		size_t i_;                          \
+		for (i_ = 0; i_ < SF_SIZE(a); ++i_) \
+			(a)[i_] = value;            \
 	} while (0)
 
-#define SF_MEMORY_COPY(destination, source, size)                                                           \
-	do {                                                                                                \
-		u64 i_;                                                                                     \
-		for (i_ = 0; i_ < size; ++i_) ((sf_byte *)destination)[i_] = ((sf_byte const *)source)[i_]; \
+#define SF_MEMORY_COPY(destination, source, size)                                     \
+	do {                                                                          \
+		u64 i_;                                                               \
+		for (i_ = 0; i_ < size; ++i_)                                         \
+			((sf_byte *)destination)[i_] = ((sf_byte const *)source)[i_]; \
 	} while (0)
 
-#define SF_MEMORY_SET(destination, value, size)                                                \
-	do {                                                                                   \
-		u64 i_;                                                                        \
-		for (i_ = 0; i_ < size; ++i_) ((sf_byte *)destination)[i_] = ((sf_byte)value); \
+#define SF_MEMORY_SET(destination, value, size)                          \
+	do {                                                             \
+		u64 i_;                                                  \
+		for (i_ = 0; i_ < size; ++i_)                            \
+			((sf_byte *)destination)[i_] = ((sf_byte)value); \
 	} while (0)
 
 #define SF_STRING_LITERAL(source, s)            \
@@ -98,15 +104,18 @@ sf_arena_allocate(struct sf_arena *arena, u64 size) {
 	u64	 i	       = 0;
 	u64	 required_size = 0;
 
-	if (!arena || !size) return NULL;
+	if (!arena || !size)
+		return NULL;
 
 	required_size = arena->position + size;
-	if (required_size > arena->capacity) return NULL;
+	if (required_size > arena->capacity)
+		return NULL;
 
 	memory		= &arena->data[arena->position];
 	arena->position = sf_u64_align(required_size, arena->alignment);
 
-	for (i = 0; i < size; ++i) memory[i] = 0x0;
+	for (i = 0; i < size; ++i)
+		memory[i] = 0x0;
 
 	return memory;
 }
@@ -135,7 +144,8 @@ sf_non_literal_string_size(char const *non_literal, u64 max_size) {
 	u64 i = 0;
 
 	for (i = 0; i < max_size; ++i)
-		if ('\0' == non_literal[i]) return i;
+		if ('\0' == non_literal[i])
+			return i;
 
 	return max_size;
 }
@@ -150,10 +160,12 @@ sf_public sf_bool
 sf_string_compare(struct sf_string const *lhs, struct sf_string const *rhs, u64 max_size) {
 	u64 i = 0;
 
-	if (lhs->size != rhs->size) return SF_FALSE;
+	if (lhs->size != rhs->size)
+		return SF_FALSE;
 
 	for (i = 0; i < SF_MIN(lhs->size, max_size); ++i)
-		if (lhs->data[i] != rhs->data[i]) return SF_FALSE;
+		if (lhs->data[i] != rhs->data[i])
+			return SF_FALSE;
 
 	return SF_TRUE;
 }
@@ -162,13 +174,15 @@ sf_public void
 sf_string_clone(struct sf_arena *arena, struct sf_string const *source, struct sf_string *destination) {
 	char *data = NULL;
 
-	if (!arena || !source || !destination) return;
+	if (!arena || !source || !destination)
+		return;
 
 	destination->size = 0;
 	destination->data = NULL;
 
 	data = sf_arena_allocate(arena, source->size);
-	if (!data) return;
+	if (!data)
+		return;
 
 	SF_MEMORY_COPY(data, source->data, source->size);
 
@@ -180,13 +194,15 @@ sf_public void
 sf_string_null_terminate(struct sf_arena *arena, struct sf_string const *source, struct sf_string *destination) {
 	char *data = NULL;
 
-	if (!arena || !source || !destination) return;
+	if (!arena || !source || !destination)
+		return;
 
 	destination->size = 0;
 	destination->data = NULL;
 
 	data = sf_arena_allocate(arena, source->size + 1);
-	if (!data) return;
+	if (!data)
+		return;
 
 	SF_MEMORY_COPY(data, source->data, destination->size);
 	data[source->size] = '\0';
