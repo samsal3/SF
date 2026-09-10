@@ -13,6 +13,8 @@
 #define SF_KB(n) ((n) * 1024)
 #define SF_MB(n) ((n) * 1024 * 1024)
 #define SF_GB(n) ((n) * 1024 * 1024 * 1024)
+#define SF_UNUSED(x) (void)(x)
+
 
 #ifndef NULL
 #define NULL ((void *)0)

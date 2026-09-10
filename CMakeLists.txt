@@ -135,6 +135,9 @@ target_link_options("${PROJECT_NAME}_main" PRIVATE
 	"$<$<AND:$<COMPILE_LANG_AND_ID:C,Clang,AppleClang>,$<CONFIG:Release>>:"
 	-Ofast
 	">"
+	"$<$<COMPILE_LANG_AND_ID:C,MSVC>:"
+	/W4
+	">"
 )
 
 file(COPY "resources" DESTINATION "${CMAKE_BINARY_DIR}")
